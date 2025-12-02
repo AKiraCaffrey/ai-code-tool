@@ -3,7 +3,7 @@ package com.saki.sakiaicodetoolbackend.core.parser;
 /**
  * 代码解析器策略接口
  *
- * @author yupi
+ * @author sakisaki
  */
 public interface CodeParser<T> {
 

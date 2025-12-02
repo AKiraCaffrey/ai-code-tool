@@ -9,7 +9,7 @@ import com.saki.sakiaicodetoolbackend.model.enums.CodeGenTypeEnum;
 /**
  * 多文件代码保存器
  *
- * @author yupi
+ * @author sakisaki
  */
 public class MultiFileCodeFileSaverTemplate extends CodeFileSaverTemplate<MultiFileCodeResult> {
 

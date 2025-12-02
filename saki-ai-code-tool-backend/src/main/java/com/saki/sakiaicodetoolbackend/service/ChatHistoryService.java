@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * 对话历史 服务层。
  *
- * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
+ * @author sakisaki
  */
 public interface ChatHistoryService extends IService<ChatHistory> {
 
