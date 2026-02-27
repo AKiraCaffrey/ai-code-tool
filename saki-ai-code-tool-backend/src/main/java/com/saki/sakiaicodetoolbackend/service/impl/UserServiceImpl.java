@@ -26,9 +26,13 @@ import java.util.stream.Collectors;
 import static com.saki.sakiaicodetoolbackend.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
- * 用户 服务层实现。
+ * 用户服务实现类
+ * <p>
+ * 实现用户注册、登录、注销及用户信息管理功能
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {

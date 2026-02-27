@@ -8,14 +8,24 @@ import com.saki.sakiaicodetoolbackend.model.enums.CodeGenTypeEnum;
 
 /**
  * 多文件代码保存器
+ * <p>
+ * 将AI生成的HTML、CSS、JS代码分别保存为独立文件
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class MultiFileCodeFileSaverTemplate extends CodeFileSaverTemplate<MultiFileCodeResult> {
 
+
     @Override
-    protected CodeGenTypeEnum getCodeType() {
+    public CodeGenTypeEnum supportType() {
         return CodeGenTypeEnum.MULTI_FILE;
+    }
+
+    @Override
+    protected MultiFileCodeResult cast(Object codeResult) {
+        return (MultiFileCodeResult) codeResult;
     }
 
     @Override

@@ -1,20 +1,30 @@
 package com.saki.sakiaicodetoolbackend.core.parser;
 
 import com.saki.sakiaicodetoolbackend.ai.model.MultiFileCodeResult;
+import com.saki.sakiaicodetoolbackend.model.enums.CodeGenTypeEnum;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 多文件代码解析器（HTML + CSS + JS）
+ * 多文件代码解析器
+ * <p>
+ * 解析AI生成的HTML、CSS、JS代码，从Markdown代码块中提取各类型代码
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class MultiFileCodeParser implements CodeParser<MultiFileCodeResult> {
 
     private static final Pattern HTML_CODE_PATTERN = Pattern.compile("```html\\s*\\n([\\s\\S]*?)```", Pattern.CASE_INSENSITIVE);
     private static final Pattern CSS_CODE_PATTERN = Pattern.compile("```css\\s*\\n([\\s\\S]*?)```", Pattern.CASE_INSENSITIVE);
     private static final Pattern JS_CODE_PATTERN = Pattern.compile("```(?:js|javascript)\\s*\\n([\\s\\S]*?)```", Pattern.CASE_INSENSITIVE);
+
+    @Override
+    public CodeGenTypeEnum supportType() {
+        return CodeGenTypeEnum.MULTI_FILE;
+    }
 
     @Override
     public MultiFileCodeResult parseCode(String codeContent) {

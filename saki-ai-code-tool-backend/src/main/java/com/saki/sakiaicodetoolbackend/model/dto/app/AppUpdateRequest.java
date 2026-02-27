@@ -6,7 +6,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 更新应用请求
+ * 应用更新请求DTO
+ * <p>
+ * 用于用户更新应用时的请求参数封装
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 public class AppUpdateRequest implements Serializable {

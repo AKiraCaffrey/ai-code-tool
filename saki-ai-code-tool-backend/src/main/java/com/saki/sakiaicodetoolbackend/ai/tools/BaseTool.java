@@ -4,7 +4,12 @@ import cn.hutool.json.JSONObject;
 
 /**
  * 工具基类
- * 定义所有工具的通用接口
+ * <p>
+ * 定义所有AI工具的通用接口，提供工具名称、显示名称等基础功能
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public abstract class BaseTool {
 

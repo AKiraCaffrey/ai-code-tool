@@ -28,9 +28,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 对话历史 服务层实现。
+ * 对话历史服务实现类
+ * <p>
+ * 实现对话历史的增删改查及内存加载功能
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Service
 @Slf4j
@@ -91,7 +95,7 @@ public class ChatHistoryServiceImpl extends ServiceImpl<ChatHistoryMapper, ChatH
     }
 
     @Override
-    public int loadChatHistoryToMemory(Long appId, MessageWindowChatMemory chatMemory, int maxCount) {
+    public int loadChatHistoryToMemory(Long appId, MessageWindowChatMemory messageWindowChatMemory, int maxCount) {
         try {
             QueryWrapper queryWrapper = QueryWrapper.create()
                     .eq(ChatHistory::getAppId, appId)
@@ -106,12 +110,12 @@ public class ChatHistoryServiceImpl extends ServiceImpl<ChatHistoryMapper, ChatH
             // 按照时间顺序将消息添加到记忆中
             int loadedCount = 0;
             // 先清理历史缓存，防止重复加载
-            chatMemory.clear();
+            messageWindowChatMemory.clear();
             for (ChatHistory history : historyList) {
                 if (ChatHistoryMessageTypeEnum.USER.getValue().equals(history.getMessageType())) {
-                    chatMemory.add(UserMessage.from(history.getMessage()));
+                    messageWindowChatMemory.add(UserMessage.from(history.getMessage()));
                 } else if (ChatHistoryMessageTypeEnum.AI.getValue().equals(history.getMessageType())) {
-                    chatMemory.add(AiMessage.from(history.getMessage()));
+                    messageWindowChatMemory.add(AiMessage.from(history.getMessage()));
                 }
                 loadedCount++;
             }

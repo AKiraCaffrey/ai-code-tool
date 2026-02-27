@@ -15,9 +15,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户 实体类。
+ * 用户实体类
+ * <p>
+ * 对应数据库表user，存储用户基本信息
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 @Builder

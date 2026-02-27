@@ -7,7 +7,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 脱敏后的登录用户信息
+ * 登录用户视图对象VO
+ * <p>
+ * 用于前端展示的登录用户信息，已脱敏处理
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 public class LoginUserVO implements Serializable {

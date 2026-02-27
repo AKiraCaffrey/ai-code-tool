@@ -9,7 +9,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 对话历史查询请求
+ * 对话历史查询请求DTO
+ * <p>
+ * 用于查询对话历史列表时的请求参数封装
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

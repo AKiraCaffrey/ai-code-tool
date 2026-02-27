@@ -1,18 +1,28 @@
 package com.saki.sakiaicodetoolbackend.core.parser;
 
 import com.saki.sakiaicodetoolbackend.ai.model.HtmlCodeResult;
+import com.saki.sakiaicodetoolbackend.model.enums.CodeGenTypeEnum;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * HTML 单文件代码解析器
+ * HTML单文件代码解析器
+ * <p>
+ * 解析AI生成的HTML代码，从Markdown代码块中提取HTML内容
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class HtmlCodeParser implements CodeParser<HtmlCodeResult> {
 
     private static final Pattern HTML_CODE_PATTERN = Pattern.compile("```html\\s*\\n([\\s\\S]*?)```", Pattern.CASE_INSENSITIVE);
+
+    @Override
+    public CodeGenTypeEnum supportType() {
+        return CodeGenTypeEnum.HTML;
+    }
 
     @Override
     public HtmlCodeResult parseCode(String codeContent) {

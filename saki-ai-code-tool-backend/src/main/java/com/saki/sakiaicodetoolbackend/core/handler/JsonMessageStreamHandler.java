@@ -18,8 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * JSON 消息流处理器
- * 处理 VUE_PROJECT 类型的复杂流式响应，包含工具调用信息
+ * JSON消息流处理器
+ * <p>
+ * 处理VUE_PROJECT类型的复杂流式响应，包含工具调用信息
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Slf4j
 @Component
@@ -44,13 +49,14 @@ public class JsonMessageStreamHandler {
         // 收集数据用于生成后端记忆格式
         StringBuilder chatHistoryStringBuilder = new StringBuilder();
         // 用于跟踪已经见过的工具ID，判断是否是第一次调用
-        Set<String> seenToolIds = new HashSet<>();
+        Set<String> seenToolNames = new HashSet<>();
         return originFlux
                 .map(chunk -> {
                     // 解析每个 JSON 消息块
-                    return handleJsonMessageChunk(chunk, chatHistoryStringBuilder, seenToolIds);
+                    return handleJsonMessageChunk(chunk, chatHistoryStringBuilder, seenToolNames);
                 })
-                .filter(StrUtil::isNotEmpty) // 过滤空字串
+                // 过滤空字串
+                .filter(StrUtil::isNotEmpty)
                 .doOnComplete(() -> {
                     // 流式响应完成后，添加 AI 消息到对话历史
                     String aiResponse = chatHistoryStringBuilder.toString();
@@ -66,7 +72,7 @@ public class JsonMessageStreamHandler {
     /**
      * 解析并收集 TokenStream 数据
      */
-    private String handleJsonMessageChunk(String chunk, StringBuilder chatHistoryStringBuilder, Set<String> seenToolIds) {
+    private String handleJsonMessageChunk(String chunk, StringBuilder chatHistoryStringBuilder, Set<String> seenToolNames) {
         // 解析 JSON
         StreamMessage streamMessage = JSONUtil.toBean(chunk, StreamMessage.class);
         StreamMessageTypeEnum typeEnum = StreamMessageTypeEnum.getEnumByValue(streamMessage.getType());
@@ -80,12 +86,10 @@ public class JsonMessageStreamHandler {
             }
             case TOOL_REQUEST -> {
                 ToolRequestMessage toolRequestMessage = JSONUtil.toBean(chunk, ToolRequestMessage.class);
-                String toolId = toolRequestMessage.getId();
+                // String toolId = toolRequestMessage.getId();
                 String toolName = toolRequestMessage.getName();
-                // 检查是否是第一次看到这个工具 ID
-                if (toolId != null && !seenToolIds.contains(toolId)) {
-                    // 第一次调用这个工具，记录 ID 并完整返回工具信息
-                    seenToolIds.add(toolId);
+                // 检查是否是第一次看到这个工具
+                if (StrUtil.isNotBlank(toolName) && seenToolNames.add(toolName)) {
                     // 根据工具名称获取工具实例
                     BaseTool tool = toolManager.getTool(toolName);
                     // 返回格式化的工具调用信息

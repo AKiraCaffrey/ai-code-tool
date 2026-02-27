@@ -22,9 +22,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 用户 控制层。
+ * 用户控制器
+ * <p>
+ * 提供用户注册、登录、注销及管理接口
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @RestController
 @RequestMapping("/user")
@@ -36,8 +40,8 @@ public class UserController {
     /**
      * 用户注册
      *
-     * @param userRegisterRequest 用户注册请求
-     * @return 注册结果
+     * @param userRegisterRequest 用户注册请求参数
+     * @return 新注册用户的ID
      */
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
@@ -52,8 +56,8 @@ public class UserController {
     /**
      * 用户登录
      *
-     * @param userLoginRequest 用户登录请求
-     * @param request          请求对象
+     * @param userLoginRequest 用户登录请求参数
+     * @param request          HTTP请求对象
      * @return 脱敏后的用户登录信息
      */
     @PostMapping("/login")
@@ -65,6 +69,12 @@ public class UserController {
         return ResultUtils.success(loginUserVO);
     }
 
+    /**
+     * 获取当前登录用户信息
+     *
+     * @param request HTTP请求对象
+     * @return 脱敏后的登录用户信息
+     */
     @GetMapping("/get/login")
     public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
@@ -74,8 +84,8 @@ public class UserController {
     /**
      * 用户注销
      *
-     * @param request 请求对象
-     * @return
+     * @param request HTTP请求对象
+     * @return 注销是否成功
      */
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
@@ -85,7 +95,10 @@ public class UserController {
     }
 
     /**
-     * 创建用户
+     * 创建用户（管理员）
+     *
+     * @param userAddRequest 创建用户请求参数
+     * @return 新创建用户的ID
      */
     @PostMapping("/add")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -103,7 +116,10 @@ public class UserController {
     }
 
     /**
-     * 根据 id 获取用户（仅管理员）
+     * 根据ID获取用户（管理员）
+     *
+     * @param id 用户ID
+     * @return 用户信息
      */
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -115,7 +131,10 @@ public class UserController {
     }
 
     /**
-     * 根据 id 获取包装类
+     * 根据ID获取用户包装类
+     *
+     * @param id 用户ID
+     * @return 脱敏后的用户信息
      */
     @GetMapping("/get/vo")
     public BaseResponse<UserVO> getUserVOById(long id) {
@@ -125,7 +144,10 @@ public class UserController {
     }
 
     /**
-     * 删除用户
+     * 删除用户（管理员）
+     *
+     * @param deleteRequest 删除请求参数
+     * @return 删除是否成功
      */
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -138,7 +160,10 @@ public class UserController {
     }
 
     /**
-     * 更新用户
+     * 更新用户（管理员）
+     *
+     * @param userUpdateRequest 更新请求参数
+     * @return 更新是否成功
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -154,9 +179,10 @@ public class UserController {
     }
 
     /**
-     * 分页获取用户封装列表（仅管理员）
+     * 分页获取用户列表（管理员）
      *
      * @param userQueryRequest 查询请求参数
+     * @return 用户列表（分页，已脱敏）
      */
     @PostMapping("/list/page/vo")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)

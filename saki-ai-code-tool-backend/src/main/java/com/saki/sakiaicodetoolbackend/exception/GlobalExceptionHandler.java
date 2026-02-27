@@ -15,11 +15,26 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * 全局异常处理器
+ * <p>
+ * 统一处理系统中的异常，返回标准格式的错误响应
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ */
 @Hidden
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
+    /**
+     * 处理业务异常
+     *
+     * @param e 业务异常
+     * @return 统一响应
+     */
     @ExceptionHandler(BusinessException.class)
     public BaseResponse<?> businessExceptionHandler(BusinessException e) {
         log.error("BusinessException", e);

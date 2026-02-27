@@ -11,7 +11,14 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 文件保存器
+ * 代码文件保存器（已废弃）
+ * <p>
+ * 提供静态方法保存不同类型的代码文件
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ * @deprecated 请使用 {@link com.saki.sakiaicodetoolbackend.core.saver.CodeFileSaverExecutor} 替代
  */
 @Deprecated
 public class CodeFileSaver {

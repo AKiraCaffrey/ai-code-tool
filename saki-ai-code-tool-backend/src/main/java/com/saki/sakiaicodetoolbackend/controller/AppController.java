@@ -39,9 +39,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 应用 控制层。
+ * 应用控制器
+ * <p>
+ * 提供应用的增删改查、部署、下载等接口
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @RestController
 @RequestMapping("/app")
@@ -56,6 +60,16 @@ public class AppController {
     @Resource
     private ProjectDownloadService projectDownloadService;
 
+    /**
+     * AI对话生成代码
+     * <p>
+     * 通过AI对话方式生成应用代码，支持流式返回
+     *
+     * @param appId   应用ID
+     * @param message 用户输入的提示词
+     * @param request HTTP请求对象
+     * @return SSE流式响应
+     */
     @GetMapping(value = "/chat/gen/code", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @RateLimit(limitType = RateLimitType.USER, rate = 5, rateInterval = 60, message = "AI 对话请求过于频繁，请稍后再试")
     public Flux<ServerSentEvent<String>> chatToGenCode(@RequestParam Long appId,
@@ -87,10 +101,12 @@ public class AppController {
 
     /**
      * 应用部署
+     * <p>
+     * 将应用部署到服务器，返回部署URL
      *
-     * @param appDeployRequest 部署请求
-     * @param request          请求
-     * @return 部署 URL
+     * @param appDeployRequest 部署请求参数
+     * @param request          HTTP请求对象
+     * @return 部署URL
      */
     @PostMapping("/deploy")
     public BaseResponse<String> deployApp(@RequestBody AppDeployRequest appDeployRequest, HttpServletRequest request) {
@@ -110,10 +126,12 @@ public class AppController {
 
     /**
      * 下载应用代码
+     * <p>
+     * 将应用代码打包为ZIP文件下载，仅应用创建者可下载
      *
      * @param appId    应用ID
-     * @param request  请求
-     * @param response 响应
+     * @param request  HTTP请求对象
+     * @param response HTTP响应对象
      */
     @GetMapping("/download/{appId}")
     public void downloadAppCode(@PathVariable Long appId,
@@ -146,9 +164,9 @@ public class AppController {
     /**
      * 创建应用
      *
-     * @param appAddRequest 创建应用请求
-     * @param request       请求
-     * @return 应用 id
+     * @param appAddRequest 创建应用请求参数
+     * @param request       HTTP请求对象
+     * @return 新创建的应用ID
      */
     @PostMapping("/add")
     public BaseResponse<Long> addApp(@RequestBody AppAddRequest appAddRequest, HttpServletRequest request) {
@@ -160,11 +178,13 @@ public class AppController {
     }
 
     /**
-     * 更新应用（用户只能更新自己的应用名称）
+     * 更新应用
+     * <p>
+     * 用户只能更新自己创建的应用名称
      *
-     * @param appUpdateRequest 更新请求
-     * @param request          请求
-     * @return 更新结果
+     * @param appUpdateRequest 更新请求参数
+     * @param request          HTTP请求对象
+     * @return 更新是否成功
      */
     @PostMapping("/update")
     public BaseResponse<Boolean> updateApp(@RequestBody AppUpdateRequest appUpdateRequest, HttpServletRequest request) {
@@ -191,11 +211,13 @@ public class AppController {
     }
 
     /**
-     * 删除应用（用户只能删除自己的应用）
+     * 删除应用
+     * <p>
+     * 仅应用创建者或管理员可删除应用
      *
-     * @param deleteRequest 删除请求
-     * @param request       请求
-     * @return 删除结果
+     * @param deleteRequest 删除请求参数
+     * @param request       HTTP请求对象
+     * @return 删除是否成功
      */
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteApp(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
@@ -216,10 +238,10 @@ public class AppController {
     }
 
     /**
-     * 根据 id 获取应用详情
+     * 根据ID获取应用详情
      *
-     * @param id 应用 id
-     * @return 应用详情
+     * @param id 应用ID
+     * @return 应用详情（包含用户信息）
      */
     @GetMapping("/get/vo")
     public BaseResponse<AppVO> getAppVOById(long id) {
@@ -234,9 +256,9 @@ public class AppController {
     /**
      * 分页获取当前用户创建的应用列表
      *
-     * @param appQueryRequest 查询请求
-     * @param request         请求
-     * @return 应用列表
+     * @param appQueryRequest 查询请求参数
+     * @param request         HTTP请求对象
+     * @return 应用列表（分页）
      */
     @PostMapping("/my/list/page/vo")
     public BaseResponse<Page<AppVO>> listMyAppVOByPage(@RequestBody AppQueryRequest appQueryRequest, HttpServletRequest request) {
@@ -260,38 +282,20 @@ public class AppController {
     /**
      * 分页获取精选应用列表
      *
-     * @param appQueryRequest 查询请求
-     * @return 精选应用列表
+     * @param appQueryRequest 查询请求参数
+     * @return 精选应用列表（分页）
      */
     @PostMapping("/good/list/page/vo")
-    @Cacheable(
-            value = "good_app_page",
-            key = "T(com.saki.sakiaicodetoolbackend.utils.CacheKeyUtils).generateKey(#appQueryRequest)",
-            condition = "#appQueryRequest.pageNum <= 10"
-    )
     public BaseResponse<Page<AppVO>> listGoodAppVOByPage(@RequestBody AppQueryRequest appQueryRequest) {
-        ThrowUtils.throwIf(appQueryRequest == null, ErrorCode.PARAMS_ERROR);
-        // 限制每页最多 20 个
-        long pageSize = appQueryRequest.getPageSize();
-        ThrowUtils.throwIf(pageSize > 20, ErrorCode.PARAMS_ERROR, "每页最多查询 20 个应用");
-        long pageNum = appQueryRequest.getPageNum();
-        // 只查询精选的应用
-        appQueryRequest.setPriority(AppConstant.GOOD_APP_PRIORITY);
-        QueryWrapper queryWrapper = appService.getQueryWrapper(appQueryRequest);
-        // 分页查询
-        Page<App> appPage = appService.page(Page.of(pageNum, pageSize), queryWrapper);
-        // 数据封装
-        Page<AppVO> appVOPage = new Page<>(pageNum, pageSize, appPage.getTotalRow());
-        List<AppVO> appVOList = appService.getAppVOList(appPage.getRecords());
-        appVOPage.setRecords(appVOList);
-        return ResultUtils.success(appVOPage);
+        Page<AppVO> page = appService.listGoodAppVOByPage(appQueryRequest);
+        return ResultUtils.success(page);
     }
 
     /**
      * 管理员删除应用
      *
-     * @param deleteRequest 删除请求
-     * @return 删除结果
+     * @param deleteRequest 删除请求参数
+     * @return 删除是否成功
      */
     @PostMapping("/admin/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -310,8 +314,8 @@ public class AppController {
     /**
      * 管理员更新应用
      *
-     * @param appAdminUpdateRequest 更新请求
-     * @return 更新结果
+     * @param appAdminUpdateRequest 更新请求参数
+     * @return 更新是否成功
      */
     @PostMapping("/admin/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -335,8 +339,8 @@ public class AppController {
     /**
      * 管理员分页获取应用列表
      *
-     * @param appQueryRequest 查询请求
-     * @return 应用列表
+     * @param appQueryRequest 查询请求参数
+     * @return 应用列表（分页）
      */
     @PostMapping("/admin/list/page/vo")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -354,9 +358,9 @@ public class AppController {
     }
 
     /**
-     * 管理员根据 id 获取应用详情
+     * 管理员根据ID获取应用详情
      *
-     * @param id 应用 id
+     * @param id 应用ID
      * @return 应用详情
      */
     @GetMapping("/admin/get/vo")

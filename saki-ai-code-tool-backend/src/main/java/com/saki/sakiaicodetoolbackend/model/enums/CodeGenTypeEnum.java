@@ -5,6 +5,12 @@ import lombok.Getter;
 
 /**
  * 代码生成类型枚举
+ * <p>
+ * 定义应用代码生成的类型，包括HTML模式、多文件模式和Vue工程模式
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Getter
 public enum CodeGenTypeEnum {

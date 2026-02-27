@@ -10,20 +10,21 @@ import java.util.Map;
 
 /**
  * 工具管理器
- * 统一管理所有工具，提供根据名称获取工具的功能
+ * <p>
+ * 统一管理所有AI工具，提供根据名称获取工具的功能
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Slf4j
 @Component
 public class ToolManager {
 
-    /**
-     * 工具名称到工具实例的映射
-     */
+    /** 工具名称到工具实例的映射 */
     private final Map<String, BaseTool> toolMap = new HashMap<>();
 
-    /**
-     * 自动注入所有工具
-     */
+    /** 自动注入所有工具 */
     @Resource
     private BaseTool[] tools;
 

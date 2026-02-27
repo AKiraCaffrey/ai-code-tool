@@ -26,10 +26,16 @@ import reactor.core.publisher.Flux;
 import java.io.File;
 
 /**
- * AI 代码生成门面类，组合代码生成和保存功能
+ * AI代码生成门面类
+ * <p>
+ * 组合代码生成和保存功能，提供统一的代码生成入口
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
-@Service
 @Slf4j
+@Service
 public class AiCodeGeneratorFacade {
 
     @Resource
@@ -93,6 +99,7 @@ public class AiCodeGeneratorFacade {
             }
             case VUE_PROJECT -> {
                 TokenStream tokenStream = aiCodeGeneratorService.generateVueProjectCodeStream(appId, userMessage);
+                // 将 AI 的事件流 翻译成 系统里的响应流
                 yield processTokenStream(tokenStream, appId);
             }
             default -> {
@@ -111,28 +118,35 @@ public class AiCodeGeneratorFacade {
      */
     private Flux<String> processTokenStream(TokenStream tokenStream, Long appId) {
         return Flux.create(sink -> {
+                    // 接收 LLM 实时生成的文本 Token，（通常是多次）触发一次代表模型生成了一小段文本
             tokenStream.onPartialResponse((String partialResponse) -> {
                         AiResponseMessage aiResponseMessage = new AiResponseMessage(partialResponse);
+                        // 将数据转换为JSON字符串后作为 流事件 推入Flux
                         sink.next(JSONUtil.toJsonStr(aiResponseMessage));
                     })
+                    // 工具调用可视化，LLM 正在决定调用工具时触发（还没调用工具），流式输出调用工具的信息（例如：AI 正在写入 XX 文件）
                     .onPartialToolExecutionRequest((index, toolExecutionRequest) -> {
                         ToolRequestMessage toolRequestMessage = new ToolRequestMessage(toolExecutionRequest);
                         sink.next(JSONUtil.toJsonStr(toolRequestMessage));
                     })
+                    // 工具执行完成触发
                     .onToolExecuted((ToolExecution toolExecution) -> {
                         ToolExecutedMessage toolExecutedMessage = new ToolExecutedMessage(toolExecution);
                         sink.next(JSONUtil.toJsonStr(toolExecutedMessage));
                     })
+                    // 整个 LLM 调用彻底完成时触发，只有调用一次，也就是生命周期的终点
                     .onCompleteResponse((ChatResponse response) -> {
                         // 执行 Vue 项目构建（同步执行，确保预览时项目已就绪）
                         String projectPath = AppConstant.CODE_OUTPUT_ROOT_DIR + "/vue_project_" + appId;
                         vueProjectBuilder.buildProject(projectPath);
                         sink.complete();
                     })
+                    // 捕获整个流式过程中的 任何异常，这个触发后 onCompleteResponse 不会再触发，也就是异常终止
                     .onError((Throwable error) -> {
                         error.printStackTrace();
                         sink.error(error);
                     })
+                    // 启动执行
                     .start();
         });
     }

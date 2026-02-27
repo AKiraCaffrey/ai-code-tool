@@ -20,9 +20,13 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 /**
- * 对话历史 控制层。
+ * 对话历史控制器
+ * <p>
+ * 提供对话历史的查询接口
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @RestController
 @RequestMapping("/chatHistory")
@@ -35,13 +39,15 @@ public class ChatHistoryController {
     private UserService userService;
 
     /**
-     * 分页查询某个应用的对话历史（游标查询）
+     * 分页查询某个应用的对话历史
+     * <p>
+     * 支持游标查询，根据创建时间倒序返回
      *
      * @param appId          应用ID
-     * @param pageSize       页面大小
-     * @param lastCreateTime 最后一条记录的创建时间
-     * @param request        请求
-     * @return 对话历史分页
+     * @param pageSize       页面大小，默认10条
+     * @param lastCreateTime 最后一条记录的创建时间（游标）
+     * @param request        HTTP请求对象
+     * @return 对话历史分页数据
      */
     @GetMapping("/app/{appId}")
     public BaseResponse<Page<ChatHistory>> listAppChatHistory(@PathVariable Long appId,
@@ -56,8 +62,8 @@ public class ChatHistoryController {
     /**
      * 管理员分页查询所有对话历史
      *
-     * @param chatHistoryQueryRequest 查询请求
-     * @return 对话历史分页
+     * @param chatHistoryQueryRequest 查询请求参数
+     * @return 对话历史分页数据
      */
     @PostMapping("/admin/list/page/vo")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)

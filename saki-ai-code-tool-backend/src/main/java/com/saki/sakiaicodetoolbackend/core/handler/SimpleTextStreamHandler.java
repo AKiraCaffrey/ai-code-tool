@@ -8,7 +8,12 @@ import reactor.core.publisher.Flux;
 
 /**
  * 简单文本流处理器
- * 处理 HTML 和 MULTI_FILE 类型的流式响应
+ * <p>
+ * 处理HTML和MULTI_FILE类型的流式响应
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Slf4j
 public class SimpleTextStreamHandler {

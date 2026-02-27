@@ -12,9 +12,13 @@ import org.springframework.context.annotation.Configuration;
 
 
 /**
- * 腾讯云COS配置类
+ * 腾讯云COS客户端配置类
+ * <p>
+ * 配置腾讯云对象存储服务客户端，包括密钥、区域等信息
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Configuration
 @ConfigurationProperties(prefix = "cos.client")

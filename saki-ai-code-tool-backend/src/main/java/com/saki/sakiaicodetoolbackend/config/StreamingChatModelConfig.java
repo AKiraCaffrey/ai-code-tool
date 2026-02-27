@@ -13,7 +13,13 @@ import org.springframework.context.annotation.Scope;
 import java.util.List;
 
 /**
- * 流式对话模型配置
+ * 流式聊天模型配置类
+ * <p>
+ * 配置OpenAI流式聊天模型，用于AI对话生成
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Configuration
 @ConfigurationProperties(prefix = "langchain4j.open-ai.streaming-chat-model")
