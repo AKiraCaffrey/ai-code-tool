@@ -16,6 +16,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+/**
+ * 截图服务实现类
+ * <p>
+ * 实现网页截图生成和上传功能
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ */
 @Service
 @Slf4j
 public class ScreenshotServiceImpl implements ScreenshotService {

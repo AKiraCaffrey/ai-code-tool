@@ -7,7 +7,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 应用封装类
+ * 应用视图对象VO
+ * <p>
+ * 用于前端展示的应用信息，包含用户信息
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 public class AppVO implements Serializable {

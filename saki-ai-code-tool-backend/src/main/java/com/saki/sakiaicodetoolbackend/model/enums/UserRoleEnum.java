@@ -3,6 +3,15 @@ package com.saki.sakiaicodetoolbackend.model.enums;
 import cn.hutool.core.util.ObjUtil;
 import lombok.Getter;
 
+/**
+ * 用户角色枚举
+ * <p>
+ * 定义用户角色类型，包括普通用户和管理员
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ */
 @Getter
 public enum UserRoleEnum {
 

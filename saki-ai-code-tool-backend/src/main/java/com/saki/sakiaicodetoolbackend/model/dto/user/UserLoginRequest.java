@@ -6,7 +6,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户登录
+ * 用户登录请求DTO
+ * <p>
+ * 用于用户登录时的请求参数封装
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 public class UserLoginRequest implements Serializable {

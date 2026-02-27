@@ -16,6 +16,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
 
+/**
+ * 项目下载服务实现类
+ * <p>
+ * 实现项目代码打包下载功能
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ */
 @Service
 @Slf4j
 public class ProjectDownloadServiceImpl implements ProjectDownloadService {

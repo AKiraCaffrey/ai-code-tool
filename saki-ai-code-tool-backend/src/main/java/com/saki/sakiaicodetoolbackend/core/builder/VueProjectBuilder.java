@@ -8,16 +8,22 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 构建 Vue 项目
+ * Vue项目构建器
+ * <p>
+ * 提供Vue项目的构建功能，支持异步构建和依赖安装
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Slf4j
 @Component
 public class VueProjectBuilder {
 
     /**
-     * 异步构建 Vue 项目
+     * 异步构建Vue项目
      *
-     * @param projectPath
+     * @param projectPath 项目路径
      */
     public void buildProjectAsync(String projectPath) {
         Thread.ofVirtual().name("vue-builder-" + System.currentTimeMillis())

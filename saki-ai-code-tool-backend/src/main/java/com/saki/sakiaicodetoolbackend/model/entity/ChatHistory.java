@@ -15,7 +15,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 对话历史 实体类。
+ * 对话历史实体类
+ * <p>
+ * 对应数据库表chat_history，存储AI对话历史记录
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 @Builder

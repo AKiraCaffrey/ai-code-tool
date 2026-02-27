@@ -6,7 +6,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 用户创建请求
+ * 用户创建请求DTO
+ * <p>
+ * 用于管理员创建用户时的请求参数封装
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 public class UserAddRequest implements Serializable {

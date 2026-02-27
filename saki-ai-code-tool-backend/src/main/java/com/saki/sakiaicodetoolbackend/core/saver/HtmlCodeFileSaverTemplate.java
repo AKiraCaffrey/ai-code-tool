@@ -8,14 +8,24 @@ import com.saki.sakiaicodetoolbackend.model.enums.CodeGenTypeEnum;
 
 /**
  * HTML代码文件保存器
+ * <p>
+ * 将AI生成的HTML代码保存为index.html文件
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class HtmlCodeFileSaverTemplate extends CodeFileSaverTemplate<HtmlCodeResult> {
 
+
     @Override
-    protected CodeGenTypeEnum getCodeType() {
+    public CodeGenTypeEnum supportType() {
         return CodeGenTypeEnum.HTML;
+    }
+
+    @Override
+    protected HtmlCodeResult cast(Object codeResult) {
+        return (HtmlCodeResult) codeResult;
     }
 
     @Override
@@ -26,7 +36,6 @@ public class HtmlCodeFileSaverTemplate extends CodeFileSaverTemplate<HtmlCodeRes
     @Override
     protected void validateInput(HtmlCodeResult result) {
         super.validateInput(result);
-        // HTML 代码不能为空
         if (StrUtil.isBlank(result.getHtmlCode())) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "HTML 代码不能为空");
         }

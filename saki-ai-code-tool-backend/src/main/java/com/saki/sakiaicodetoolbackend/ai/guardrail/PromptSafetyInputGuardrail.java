@@ -9,11 +9,17 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Prompt 安全审查护轨
+ * Prompt安全审查护轨
+ * <p>
+ * 对用户输入进行安全审查，防止Prompt注入攻击和敏感内容输入
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class PromptSafetyInputGuardrail implements InputGuardrail {
 
-    // 敏感词列表
+    /** 敏感词列表 */
     private static final List<String> SENSITIVE_WORDS = Arrays.asList(
             "忽略之前的指令", "ignore previous instructions", "ignore above",
             "破解", "hack", "绕过", "bypass", "越狱", "jailbreak"

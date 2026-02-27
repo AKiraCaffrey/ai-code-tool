@@ -4,7 +4,13 @@ import cn.hutool.core.util.ObjUtil;
 import lombok.Getter;
 
 /**
- * 对话历史消息枚举类型
+ * 对话历史消息类型枚举
+ * <p>
+ * 定义对话消息的类型，包括用户消息和AI消息
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Getter
 public enum ChatHistoryMessageTypeEnum {

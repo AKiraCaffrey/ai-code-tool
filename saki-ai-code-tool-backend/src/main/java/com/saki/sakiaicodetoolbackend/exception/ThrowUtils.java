@@ -1,12 +1,21 @@
 package com.saki.sakiaicodetoolbackend.exception;
 
+/**
+ * 异常抛出工具类
+ * <p>
+ * 提供条件判断后抛出异常的便捷方法
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ */
 public class ThrowUtils {
 
     /**
      * 条件成立则抛出异常
      *
-     * @param condition
-     * @param runtimeException
+     * @param condition        条件
+     * @param runtimeException 运行时异常
      */
     public static void throwIf(boolean condition, RuntimeException runtimeException) {
         if (condition) {

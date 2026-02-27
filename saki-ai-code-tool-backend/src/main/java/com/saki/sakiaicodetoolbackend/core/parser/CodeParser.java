@@ -1,5 +1,7 @@
 package com.saki.sakiaicodetoolbackend.core.parser;
 
+import com.saki.sakiaicodetoolbackend.model.enums.CodeGenTypeEnum;
+
 /**
  * 代码解析器策略接口
  *
@@ -7,6 +9,10 @@ package com.saki.sakiaicodetoolbackend.core.parser;
  */
 public interface CodeParser<T> {
 
+    /**
+     * 当前解析器支持的类型
+     */
+    CodeGenTypeEnum supportType();
     /**
      * 解析代码内容
      *

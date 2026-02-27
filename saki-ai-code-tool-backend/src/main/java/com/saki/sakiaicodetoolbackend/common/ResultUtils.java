@@ -3,16 +3,22 @@ package com.saki.sakiaicodetoolbackend.common;
 import com.saki.sakiaicodetoolbackend.exception.ErrorCode;
 
 /**
- * 快速构造响应结果的工具类
+ * 响应结果工具类
+ * <p>
+ * 快速构造统一格式的响应结果
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class ResultUtils {
 
     /**
-     * 成功
+     * 成功响应
      *
-     * @param data 数据
+     * @param data 响应数据
      * @param <T>  数据类型
-     * @return 响应
+     * @return 成功响应
      */
     public static <T> BaseResponse<T> success(T data) {
         return new BaseResponse<>(0, data, "ok");

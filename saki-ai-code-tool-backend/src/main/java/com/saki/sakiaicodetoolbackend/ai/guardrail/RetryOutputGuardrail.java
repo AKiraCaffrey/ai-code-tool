@@ -6,9 +6,21 @@ import dev.langchain4j.guardrail.OutputGuardrailResult;
 
 /**
  * 重试输出护轨
+ * <p>
+ * 验证AI输出内容的有效性，对空内容、过短内容或敏感内容进行重试
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 public class RetryOutputGuardrail implements OutputGuardrail {
 
+    /**
+     * 验证AI输出
+     *
+     * @param responseFromLLM LLM响应消息
+     * @return 验证结果
+     */
     @Override
     public OutputGuardrailResult validate(AiMessage responseFromLLM) {
         String response = responseFromLLM.text();

@@ -8,13 +8,22 @@ import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.UserMessage;
 import reactor.core.publisher.Flux;
 
+/**
+ * AI代码生成服务接口
+ * <p>
+ * 提供AI代码生成功能，支持HTML代码和多文件代码生成
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ */
 public interface AiCodeGeneratorService {
 
     /**
-     * 生成 HTML 代码
+     * 生成HTML代码
      *
      * @param userMessage 用户提示词
-     * @return AI 的输出结果
+     * @return HTML代码生成结果
      */
     @SystemMessage(fromResource = "prompt/codegen-html-system-prompt.txt")
     HtmlCodeResult generateHtmlCode(String userMessage);
@@ -23,7 +32,7 @@ public interface AiCodeGeneratorService {
      * 生成多文件代码
      *
      * @param userMessage 用户提示词
-     * @return AI 的输出结果
+     * @return 多文件代码生成结果
      */
     @SystemMessage(fromResource = "prompt/codegen-multi-file-system-prompt.txt")
     MultiFileCodeResult generateMultiFileCode(String userMessage);

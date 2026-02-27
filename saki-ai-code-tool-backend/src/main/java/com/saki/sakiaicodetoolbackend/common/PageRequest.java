@@ -4,6 +4,9 @@ import lombok.Data;
 
 /**
  * 请求封装类
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-25
  */
 @Data
 public class PageRequest {

@@ -2,7 +2,9 @@
 application-local.yml
 application-prod.yml
 tmp
-
+.trae
+saki-ai-code-tool-backend.iml
+.DS_Store
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar

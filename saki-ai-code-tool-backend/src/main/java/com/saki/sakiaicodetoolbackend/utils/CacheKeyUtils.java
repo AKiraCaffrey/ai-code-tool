@@ -5,8 +5,9 @@ import cn.hutool.json.JSONUtil;
 
 /**
  * 缓存 key 生成工具类
- *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-25
  */
 public class CacheKeyUtils {
 

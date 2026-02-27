@@ -9,8 +9,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
 /**
- * 工作流 SSE 控制器
- * 演示 LangGraph4j 工作流的流式输出功能
+ * 工作流SSE控制器
+ * <p>
+ * 提供LangGraph4j工作流的流式输出接口，支持同步、Flux和SSE三种执行方式
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @RestController
 @RequestMapping("/workflow")
@@ -19,6 +24,9 @@ public class WorkflowSseController {
 
     /**
      * 同步执行工作流
+     *
+     * @param prompt 提示词
+     * @return 工作流执行结果
      */
     @PostMapping("/execute")
     public WorkflowContext executeWorkflow(@RequestParam String prompt) {
@@ -27,7 +35,10 @@ public class WorkflowSseController {
     }
 
     /**
-     * Flux 流式执行工作流
+     * Flux流式执行工作流
+     *
+     * @param prompt 提示词
+     * @return Flux流式响应
      */
     @GetMapping(value = "/execute-flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> executeWorkflowWithFlux(@RequestParam String prompt) {
@@ -36,7 +47,10 @@ public class WorkflowSseController {
     }
 
     /**
-     * SSE 流式执行工作流
+     * SSE流式执行工作流
+     *
+     * @param prompt 提示词
+     * @return SSE发射器
      */
     @GetMapping(value = "/execute-sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter executeWorkflowWithSse(@RequestParam String prompt) {

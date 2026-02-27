@@ -15,9 +15,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 应用 实体类。
+ * 应用实体类
+ * <p>
+ * 对应数据库表app，存储应用基本信息
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Data
 @Builder

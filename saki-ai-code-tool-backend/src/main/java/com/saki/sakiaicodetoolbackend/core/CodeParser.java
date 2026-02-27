@@ -7,10 +7,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 代码解析器
+ * 代码解析器（已废弃）
+ * <p>
  * 提供静态方法解析不同类型的代码内容
  *
- * @author sakisaki
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
+ * @deprecated 请使用 {@link com.saki.sakiaicodetoolbackend.core.parser.CodeParserExecutor} 替代
  */
 @Deprecated
 public class CodeParser {

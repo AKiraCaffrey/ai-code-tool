@@ -7,7 +7,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * Spring上下文工具类
- * 用于在静态方法中获取Spring Bean
+ * <p>
+ * 用于在静态方法中获取Spring Bean，实现ApplicationContextAware接口
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-02-26
  */
 @Component
 public class SpringContextUtil implements ApplicationContextAware {
@@ -15,7 +20,11 @@ public class SpringContextUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     /**
-     * 获取Spring Bean
+     * 根据类型获取Spring Bean
+     *
+     * @param clazz Bean类型
+     * @param <T>   Bean类型泛型
+     * @return Spring Bean实例
      */
     public static <T> T getBean(Class<T> clazz) {
         return applicationContext.getBean(clazz);
