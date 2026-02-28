@@ -6,9 +6,11 @@ import com.saki.sakiaicodetoolbackend.ai.AiCodeGeneratorServiceFactory;
 import com.saki.sakiaicodetoolbackend.ai.model.HtmlCodeResult;
 import com.saki.sakiaicodetoolbackend.ai.model.MultiFileCodeResult;
 import com.saki.sakiaicodetoolbackend.ai.model.message.AiResponseMessage;
+import com.saki.sakiaicodetoolbackend.ai.model.message.BuildStatusMessage;
 import com.saki.sakiaicodetoolbackend.ai.model.message.ToolExecutedMessage;
 import com.saki.sakiaicodetoolbackend.ai.model.message.ToolRequestMessage;
 import com.saki.sakiaicodetoolbackend.constant.AppConstant;
+import com.saki.sakiaicodetoolbackend.core.builder.BuildStatusEnum;
 import com.saki.sakiaicodetoolbackend.core.builder.VueProjectBuilder;
 import com.saki.sakiaicodetoolbackend.core.parser.CodeParserExecutor;
 import com.saki.sakiaicodetoolbackend.core.saver.CodeFileSaverExecutor;
@@ -49,7 +51,7 @@ public class AiCodeGeneratorFacade {
      *
      * @param userMessage     用户提示词
      * @param codeGenTypeEnum 生成类型
-     * @param appId           应用 ID
+     * @param appId           应用ID
      * @return 保存的目录
      */
     public File generateAndSaveCode(String userMessage, CodeGenTypeEnum codeGenTypeEnum, Long appId) {
@@ -79,8 +81,8 @@ public class AiCodeGeneratorFacade {
      *
      * @param userMessage     用户提示词
      * @param codeGenTypeEnum 生成类型
-     * @param appId           应用 ID
-     * @return 保存的目录
+     * @param appId           应用ID
+     * @return 流式响应
      */
     public Flux<String> generateAndSaveCodeStream(String userMessage, CodeGenTypeEnum codeGenTypeEnum, Long appId) {
         if (codeGenTypeEnum == null) {
@@ -110,10 +112,10 @@ public class AiCodeGeneratorFacade {
     }
 
     /**
-     * 将 TokenStream 转换为 Flux<String>，并传递工具调用信息
+     * 将TokenStream转换为Flux<String>，并传递工具调用信息
      *
-     * @param tokenStream TokenStream 对象
-     * @param appId       应用 ID
+     * @param tokenStream TokenStream对象
+     * @param appId       应用ID
      * @return Flux<String> 流式响应
      */
     private Flux<String> processTokenStream(TokenStream tokenStream, Long appId) {
@@ -136,14 +138,23 @@ public class AiCodeGeneratorFacade {
                     })
                     // 整个 LLM 调用彻底完成时触发，只有调用一次，也就是生命周期的终点
                     .onCompleteResponse((ChatResponse response) -> {
-                        // 执行 Vue 项目构建（同步执行，确保预览时项目已就绪）
                         String projectPath = AppConstant.CODE_OUTPUT_ROOT_DIR + "/vue_project_" + appId;
-                        vueProjectBuilder.buildProject(projectPath);
-                        sink.complete();
+                        Thread.ofVirtual().name("vue-builder-" + appId).start(() -> {
+                            vueProjectBuilder.buildProjectWithCallback(projectPath, status -> {
+                                BuildStatusMessage statusMessage = new BuildStatusMessage(
+                                        status.getValue(),
+                                        status.getText()
+                                );
+                                sink.next(JSONUtil.toJsonStr(statusMessage));
+                                if (status == BuildStatusEnum.COMPLETED || status == BuildStatusEnum.FAILED) {
+                                    sink.complete();
+                                }
+                            });
+                        });
                     })
                     // 捕获整个流式过程中的 任何异常，这个触发后 onCompleteResponse 不会再触发，也就是异常终止
                     .onError((Throwable error) -> {
-                        error.printStackTrace();
+                        log.error("AI 生成过程中发生异常: {}", error.getMessage(), error);
                         sink.error(error);
                     })
                     // 启动执行
@@ -156,7 +167,7 @@ public class AiCodeGeneratorFacade {
      *
      * @param codeStream  代码流
      * @param codeGenType 代码生成类型
-     * @param appId       应用 ID
+     * @param appId       应用ID
      * @return 流式响应
      */
     private Flux<String> processCodeStream(Flux<String> codeStream, CodeGenTypeEnum codeGenType, Long appId) {
