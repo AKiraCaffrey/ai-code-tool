@@ -15,12 +15,24 @@ import java.nio.file.Paths;
 
 /**
  * 文件读取工具
- * 支持 AI 通过工具调用的方式读取文件内容
+ * <p>
+ * 支持AI通过工具调用的方式读取文件内容
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Slf4j
 @Component
 public class FileReadTool extends BaseTool {
 
+    /**
+     * 读取指定路径的文件内容
+     *
+     * @param relativeFilePath 文件的相对路径
+     * @param appId            应用ID
+     * @return 文件内容或错误信息
+     */
     @Tool("读取指定路径的文件内容")
     public String readFile(
             @P("文件的相对路径")
@@ -45,16 +57,32 @@ public class FileReadTool extends BaseTool {
         }
     }
 
+    /**
+     * 获取工具名称
+     *
+     * @return 工具英文名称
+     */
     @Override
     public String getToolName() {
         return "readFile";
     }
 
+    /**
+     * 获取工具显示名称
+     *
+     * @return 工具中文名称
+     */
     @Override
     public String getDisplayName() {
         return "读取文件";
     }
 
+    /**
+     * 生成工具执行结果格式
+     *
+     * @param arguments 工具执行参数
+     * @return 格式化的工具执行结果
+     */
     @Override
     public String generateToolExecutedResult(JSONObject arguments) {
         String relativeFilePath = arguments.getStr("relativeFilePath");

@@ -6,17 +6,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 告诉 AI 要退出的工具
+ * 退出工具调用工具
+ * <p>
+ * 用于告诉AI退出工具调用循环，防止无限循环
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Slf4j
 @Component
 public class ExitTool extends BaseTool {
 
+    /**
+     * 获取工具名称
+     *
+     * @return 工具英文名称
+     */
     @Override
     public String getToolName() {
         return "exit";
     }
 
+    /**
+     * 获取工具显示名称
+     *
+     * @return 工具中文名称
+     */
     @Override
     public String getDisplayName() {
         return "退出工具调用";
@@ -24,6 +40,7 @@ public class ExitTool extends BaseTool {
 
     /**
      * 退出工具调用
+     * <p>
      * 当任务完成或无需继续使用工具时调用此方法
      *
      * @return 退出确认信息
@@ -34,6 +51,12 @@ public class ExitTool extends BaseTool {
         return "不要继续调用工具，可以输出最终结果了";
     }
 
+    /**
+     * 生成工具执行结果格式
+     *
+     * @param arguments 工具执行参数
+     * @return 格式化的工具执行结果
+     */
     @Override
     public String generateToolExecutedResult(JSONObject arguments) {
         return "\n\n[执行结束]\n\n";

@@ -40,6 +40,9 @@ public class RetryOutputGuardrail implements OutputGuardrail {
 
     /**
      * 检查是否包含敏感内容
+     *
+     * @param response 响应内容
+     * @return 是否包含敏感内容
      */
     private boolean containsSensitiveContent(String response) {
         String lowerResponse = response.toLowerCase();

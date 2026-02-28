@@ -17,12 +17,25 @@ import java.nio.file.StandardOpenOption;
 
 /**
  * 文件写入工具
- * 支持 AI 通过工具调用的方式写入文件
+ * <p>
+ * 支持AI通过工具调用的方式写入文件，自动处理相对路径和目录创建
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Slf4j
 @Component
 public class FileWriteTool extends BaseTool {
 
+    /**
+     * 写入文件到指定路径
+     *
+     * @param relativeFilePath 文件的相对路径
+     * @param content          要写入文件的内容
+     * @param appId            应用ID
+     * @return 操作结果信息
+     */
     @Tool("写入文件到指定路径")
     public String writeFile(
             @P("文件的相对路径")
@@ -58,16 +71,32 @@ public class FileWriteTool extends BaseTool {
         }
     }
 
+    /**
+     * 获取工具名称
+     *
+     * @return 工具英文名称
+     */
     @Override
     public String getToolName() {
         return "writeFile";
     }
 
+    /**
+     * 获取工具显示名称
+     *
+     * @return 工具中文名称
+     */
     @Override
     public String getDisplayName() {
         return "写入文件";
     }
 
+    /**
+     * 生成工具执行结果格式
+     *
+     * @param arguments 工具执行参数
+     * @return 格式化的工具执行结果
+     */
     @Override
     public String generateToolExecutedResult(JSONObject arguments) {
         String relativeFilePath = arguments.getStr("relativeFilePath");

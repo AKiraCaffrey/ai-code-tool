@@ -16,12 +16,26 @@ import java.nio.file.StandardOpenOption;
 
 /**
  * 文件修改工具
- * 支持 AI 通过工具调用的方式修改文件内容
+ * <p>
+ * 支持AI通过工具调用的方式修改文件内容，用新内容替换指定的旧内容
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Slf4j
 @Component
 public class FileModifyTool extends BaseTool {
 
+    /**
+     * 修改文件内容，用新内容替换指定的旧内容
+     *
+     * @param relativeFilePath 文件的相对路径
+     * @param oldContent       要替换的旧内容
+     * @param newContent       替换后的新内容
+     * @param appId            应用ID
+     * @return 操作结果信息
+     */
     @Tool("修改文件内容，用新内容替换指定的旧内容")
     public String modifyFile(
             @P("文件的相对路径")
@@ -60,16 +74,32 @@ public class FileModifyTool extends BaseTool {
         }
     }
 
+    /**
+     * 获取工具名称
+     *
+     * @return 工具英文名称
+     */
     @Override
     public String getToolName() {
         return "modifyFile";
     }
 
+    /**
+     * 获取工具显示名称
+     *
+     * @return 工具中文名称
+     */
     @Override
     public String getDisplayName() {
         return "修改文件";
     }
 
+    /**
+     * 生成工具执行结果格式
+     *
+     * @param arguments 工具执行参数
+     * @return 格式化的工具执行结果
+     */
     @Override
     public String generateToolExecutedResult(JSONObject arguments) {
         String relativeFilePath = arguments.getStr("relativeFilePath");

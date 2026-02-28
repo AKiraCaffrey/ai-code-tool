@@ -17,10 +17,22 @@ public enum StreamMessageTypeEnum {
     TOOL_EXECUTED("tool_executed", "工具执行结果"),
     BUILD_STATUS("build_status", "构建状态");
 
+    /**
+     * 枚举值
+     */
     private final String value;
 
+    /**
+     * 枚举描述文本
+     */
     private final String text;
 
+    /**
+     * 构造函数
+     *
+     * @param value 枚举值
+     * @param text  枚举描述文本
+     */
     StreamMessageTypeEnum(String value, String text) {
         this.value = value;
         this.text = text;

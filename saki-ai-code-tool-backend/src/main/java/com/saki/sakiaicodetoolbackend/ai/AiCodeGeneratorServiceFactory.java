@@ -50,19 +50,35 @@ public class AiCodeGeneratorServiceFactory {
                 log.debug("AI 服务实例被移除，缓存键: {}, 原因: {}", key, cause);
             })
             .build();
+
+    /**
+     * OpenAI 聊天模型
+     */
     @Resource(name = "openAiChatModel")
     private ChatModel chatModel;
+
+    /**
+     * Redis 对话记忆存储
+     */
     @Resource
     private RedisChatMemoryStore redisChatMemoryStore;
+
+    /**
+     * 对话历史服务
+     */
     @Resource
     private ChatHistoryService chatHistoryService;
+
+    /**
+     * 工具管理器
+     */
     @Resource
     private ToolManager toolManager;
 
     /**
      * 创建 AI 代码生成器服务
      *
-     * @return
+     * @return AI 代码生成器服务实例
      */
     @Bean
     public AiCodeGeneratorService aiCodeGeneratorService() {
@@ -72,8 +88,8 @@ public class AiCodeGeneratorServiceFactory {
     /**
      * 根据 appId 获取服务（为了兼容老逻辑）
      *
-     * @param appId
-     * @return
+     * @param appId 应用ID
+     * @return AI 代码生成器服务实例
      */
     public AiCodeGeneratorService getAiCodeGeneratorService(long appId) {
         return getAiCodeGeneratorService(appId, CodeGenTypeEnum.HTML);
@@ -82,9 +98,9 @@ public class AiCodeGeneratorServiceFactory {
     /**
      * 根据 appId 获取服务
      *
-     * @param appId       应用 id
-     * @param codeGenType 生成类型
-     * @return
+     * @param appId       应用ID
+     * @param codeGenType 代码生成类型
+     * @return AI 代码生成器服务实例
      */
     public AiCodeGeneratorService getAiCodeGeneratorService(long appId, CodeGenTypeEnum codeGenType) {
         String cacheKey = buildCacheKey(appId, codeGenType);
@@ -94,9 +110,9 @@ public class AiCodeGeneratorServiceFactory {
     /**
      * 构造缓存键
      *
-     * @param appId
-     * @param codeGenType
-     * @return
+     * @param appId       应用ID
+     * @param codeGenType 代码生成类型
+     * @return 缓存键
      */
     private String buildCacheKey(long appId, CodeGenTypeEnum codeGenType) {
         return appId + "_" + codeGenType.getValue();
@@ -105,9 +121,9 @@ public class AiCodeGeneratorServiceFactory {
     /**
      * 创建新的 AI 服务实例
      *
-     * @param appId       应用 id
-     * @param codeGenType 生成类型
-     * @return
+     * @param appId       应用ID
+     * @param codeGenType 代码生成类型
+     * @return AI 代码生成器服务实例
      */
     private AiCodeGeneratorService createAiCodeGeneratorService(long appId, CodeGenTypeEnum codeGenType) {
         log.info("为 appId: {} 创建新的 AI 服务实例", appId);
@@ -134,9 +150,12 @@ public class AiCodeGeneratorServiceFactory {
                                 ToolExecutionResultMessage.from(toolExecutionRequest,
                                         "Error: there is no tool called " + toolExecutionRequest.name())
                         )
-                        .maxSequentialToolsInvocations(20)  // 最多连续调用 20 次工具
-                        .inputGuardrails(new PromptSafetyInputGuardrail()) // 添加输入护轨
-                    //    .outputGuardrails(new RetryOutputGuardrail()) // 添加输出护轨，为了流式输出，这里不使用
+                        // 最多连续调用 20 次工具
+                        .maxSequentialToolsInvocations(20)
+                        // 添加输入护轨
+                        .inputGuardrails(new PromptSafetyInputGuardrail())
+                        // 添加输出护轨，为了流式输出，这里不使用
+                        // .outputGuardrails(new RetryOutputGuardrail())
                         .build();
             }
             // HTML 和 多文件生成，使用流式对话模型
@@ -147,8 +166,10 @@ public class AiCodeGeneratorServiceFactory {
                         .chatModel(chatModel)
                         .streamingChatModel(openAiStreamingChatModel)
                         .chatMemory(messageWindowChatMemory)
-                        .inputGuardrails(new PromptSafetyInputGuardrail()) // 添加输入护轨
-                    //    .outputGuardrails(new RetryOutputGuardrail()) // 添加输出护轨，为了流式输出，这里不使用
+                        // 添加输入护轨
+                        .inputGuardrails(new PromptSafetyInputGuardrail())
+                        // 添加输出护轨，为了流式输出，这里不使用
+                        // .outputGuardrails(new RetryOutputGuardrail())
                         .build();
             }
             default ->
