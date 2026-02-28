@@ -111,6 +111,18 @@ public class JsonMessageStreamHandler {
                 chatHistoryStringBuilder.append(output);
                 return output;
             }
+            case BUILD_STATUS -> {
+                BuildStatusMessage buildStatusMessage = JSONUtil.toBean(chunk, BuildStatusMessage.class);
+                String status = buildStatusMessage.getStatus();
+                String statusMessage = buildStatusMessage.getMessage();
+                if ("completed".equals(status)) {
+                    return "\n\n**构建完成**\n\n";
+                } else if ("failed".equals(status)) {
+                    return String.format("\n\n**构建失败**: %s\n\n", statusMessage);
+                } else {
+                    return String.format("\n\n**%s**\n\n", statusMessage);
+                }
+            }
             default -> {
                 log.error("不支持的消息类型: {}", typeEnum);
                 return "";
