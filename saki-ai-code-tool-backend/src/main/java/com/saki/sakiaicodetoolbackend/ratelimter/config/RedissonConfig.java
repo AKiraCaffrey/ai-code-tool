@@ -8,21 +8,47 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Redisson 配置类
+ * <p>
+ * 配置 Redisson 客户端连接 Redis，用于分布式限流等功能
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
+ */
 @Configuration
 public class RedissonConfig {
 
+    /**
+     * Redis 主机地址
+     */
     @Value("${spring.data.redis.host}")
     private String redisHost;
 
+    /**
+     * Redis 端口
+     */
     @Value("${spring.data.redis.port}")
     private Integer redisPort;
 
+    /**
+     * Redis 密码
+     */
     @Value("${spring.data.redis.password}")
     private String redisPassword;
 
+    /**
+     * Redis 数据库索引
+     */
     @Value("${spring.data.redis.database}")
     private Integer redisDatabase;
 
+    /**
+     * 创建 Redisson 客户端
+     *
+     * @return Redisson 客户端实例
+     */
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
