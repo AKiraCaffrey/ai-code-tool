@@ -18,7 +18,7 @@ const creating = ref(false)
 const myApps = ref<API.AppVO[]>([])
 const myAppsPage = reactive({
   current: 1,
-  pageSize: 6,
+  pageSize: 8,
   total: 0,
 })
 
@@ -26,9 +26,10 @@ const myAppsPage = reactive({
 const featuredApps = ref<API.AppVO[]>([])
 const featuredAppsPage = reactive({
   current: 1,
-  pageSize: 6,
+  pageSize: 8,
   total: 0,
 })
+const hasMoreFeatured = ref(true)
 
 // 设置提示词
 const setPrompt = (prompt: string) => {
@@ -96,7 +97,7 @@ const loadMyApps = async () => {
 }
 
 // 加载精选应用
-const loadFeaturedApps = async () => {
+const loadFeaturedApps = async (isLoadMore = false) => {
   try {
     const res = await listGoodAppVoByPage({
       pageNum: featuredAppsPage.current,
@@ -106,12 +107,23 @@ const loadFeaturedApps = async () => {
     })
 
     if (res.data.code === 0 && res.data.data) {
-      featuredApps.value = res.data.data.records || []
+      if (isLoadMore) {
+        featuredApps.value = [...featuredApps.value, ...(res.data.data.records || [])]
+      } else {
+        featuredApps.value = res.data.data.records || []
+      }
       featuredAppsPage.total = res.data.data.totalRow || 0
+      hasMoreFeatured.value = featuredApps.value.length < featuredAppsPage.total
     }
   } catch (error) {
     console.error('加载精选应用失败：', error)
   }
+}
+
+// 加载更多精选应用
+const loadMoreFeatured = () => {
+  featuredAppsPage.current++
+  loadFeaturedApps(true)
 }
 
 // 查看对话
@@ -161,8 +173,8 @@ onMounted(() => {
     <div class="container">
       <!-- 网站标题和描述 -->
       <div class="hero-section">
-        <h1 class="hero-title">AI 零代码应用生成平台</h1>
-        <p class="hero-description">一句话轻松创建网站应用</p>
+        <img class="hero-title-img" src="@/assets/ZeroCode-HomeTitle.png" alt="Logo" />
+        <p class="hero-description">与 AI 对话轻松创建应用和网站</p>
       </div>
 
       <!-- 用户提示词输入框 -->
@@ -222,9 +234,12 @@ onMounted(() => {
           >作品展示网站</a-button
         >
       </div>
+    </div>
 
-      <!-- 我的作品 -->
-      <div class="section">
+    <!-- 内容区域容器 -->
+    <div class="content-container">
+      <!-- 我的作品（仅登录用户可见） -->
+      <div v-if="loginUserStore.loginUser.id" class="section">
         <h2 class="section-title">我的作品</h2>
         <div class="app-grid">
           <AppCard
@@ -235,22 +250,21 @@ onMounted(() => {
             @view-work="viewWork"
           />
         </div>
-        <div class="pagination-wrapper">
+        <div v-if="myAppsPage.total > myAppsPage.pageSize" class="pagination-wrapper">
           <a-pagination
             v-model:current="myAppsPage.current"
             v-model:page-size="myAppsPage.pageSize"
             :total="myAppsPage.total"
             :show-size-changer="false"
-            :show-total="(total: number) => `共 ${total} 个应用`"
             @change="loadMyApps"
           />
         </div>
       </div>
 
-      <!-- 精选案例 -->
+      <!-- 案例广场 -->
       <div class="section">
-        <h2 class="section-title">精选案例</h2>
-        <div class="featured-grid">
+        <h2 class="section-title">案例广场</h2>
+        <div class="app-grid">
           <AppCard
             v-for="app in featuredApps"
             :key="app.id"
@@ -260,15 +274,8 @@ onMounted(() => {
             @view-work="viewWork"
           />
         </div>
-        <div class="pagination-wrapper">
-          <a-pagination
-            v-model:current="featuredAppsPage.current"
-            v-model:page-size="featuredAppsPage.pageSize"
-            :total="featuredAppsPage.total"
-            :show-size-changer="false"
-            :show-total="(total: number) => `共 ${total} 个案例`"
-            @change="loadFeaturedApps"
-          />
+        <div v-if="hasMoreFeatured" class="load-more-wrapper">
+          <a-button type="default" size="large" @click="loadMoreFeatured">加载更多</a-button>
         </div>
       </div>
     </div>
@@ -281,75 +288,13 @@ onMounted(() => {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background:
-    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 8%, #e2e8f0 20%, #cbd5e1 100%),
-    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+  background-image: url('@/assets/NoCode-Background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   position: relative;
   overflow: hidden;
-}
-
-/* 科技感网格背景 */
-#homePage::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image:
-    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(rgba(139, 92, 246, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
-  background-size:
-    100px 100px,
-    100px 100px,
-    20px 20px,
-    20px 20px;
-  pointer-events: none;
-  animation: gridFloat 20s ease-in-out infinite;
-}
-
-/* 动态光效 */
-#homePage::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(
-      600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(59, 130, 246, 0.08) 0%,
-      rgba(139, 92, 246, 0.06) 40%,
-      transparent 80%
-    ),
-    linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.04) 50%, transparent 70%),
-    linear-gradient(-45deg, transparent 30%, rgba(139, 92, 246, 0.04) 50%, transparent 70%);
-  pointer-events: none;
-  animation: lightPulse 8s ease-in-out infinite alternate;
-}
-
-@keyframes gridFloat {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(5px, 5px);
-  }
-}
-
-@keyframes lightPulse {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0.7;
-  }
 }
 
 .container {
@@ -367,76 +312,21 @@ onMounted(() => {
 /* 英雄区域 */
 .hero-section {
   text-align: center;
-  padding: 80px 0 60px;
-  margin-bottom: 28px;
+  padding: 40px 0 30px;
+  margin-bottom: 20px;
   color: #1e293b;
   position: relative;
   overflow: hidden;
 }
 
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(ellipse 800px 400px at center, rgba(59, 130, 246, 0.12) 0%, transparent 70%),
-    linear-gradient(45deg, transparent 30%, rgba(139, 92, 246, 0.05) 50%, transparent 70%),
-    linear-gradient(-45deg, transparent 30%, rgba(16, 185, 129, 0.04) 50%, transparent 70%);
-  animation: heroGlow 10s ease-in-out infinite alternate;
-}
-
-@keyframes heroGlow {
-  0% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
-
-@keyframes rotate {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-
-.hero-title {
-  font-size: 56px;
-  font-weight: 700;
-  margin: 0 0 20px;
-  line-height: 1.2;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -1px;
-  position: relative;
-  z-index: 2;
-  animation: titleShimmer 3s ease-in-out infinite;
-}
-
-@keyframes titleShimmer {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.hero-title-img {
+  height: 270px;
+  margin-bottom: -80px;
 }
 
 .hero-description {
-  font-size: 20px;
+  font-size: 17px;
   margin: 0;
-  opacity: 0.8;
   color: #64748b;
   position: relative;
   z-index: 2;
@@ -450,6 +340,7 @@ onMounted(() => {
 }
 
 .prompt-input {
+  resize: none;
   border-radius: 16px;
   border: none;
   font-size: 16px;
@@ -521,41 +412,75 @@ onMounted(() => {
 
 /* 区域标题 */
 .section {
-  margin-bottom: 60px;
+  margin-bottom: 40px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
 }
 
 .section-title {
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 600;
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   color: #1e293b;
 }
 
-/* 我的作品网格 */
-.app-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+/* 内容区域容器 */
+.content-container {
+  max-width: 1400px;
+  margin: 0 auto 40px;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 2;
 }
 
-/* 精选案例网格 */
-.featured-grid {
+/* 卡片网格 - 一行4个 */
+.app-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 /* 分页 */
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 32px;
+  margin-top: 24px;
+}
+
+/* 加载更多按钮 */
+.load-more-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.load-more-wrapper .ant-btn {
+  min-width: 200px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 16px;
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
+  .app-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .app-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
   .hero-title {
     font-size: 32px;
   }
@@ -564,13 +489,17 @@ onMounted(() => {
     font-size: 16px;
   }
 
-  .app-grid,
-  .featured-grid {
+  .app-grid {
     grid-template-columns: 1fr;
   }
 
   .quick-actions {
     justify-content: center;
+  }
+
+  .content-container {
+    padding: 20px;
+    margin: 0 12px 40px;
   }
 }
 </style>

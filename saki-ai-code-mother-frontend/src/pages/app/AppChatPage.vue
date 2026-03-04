@@ -231,7 +231,7 @@ import request from '@/request'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import AppDetailModal from '@/components/AppDetailModal.vue'
 import DeploySuccessModal from '@/components/DeploySuccessModal.vue'
-import aiAvatar from '@/assets/aiAvatar.png'
+import aiAvatar from '@/assets/ZeroCode-Logo.png'
 import { API_BASE_URL, getStaticPreviewUrl } from '@/config/env'
 import { VisualEditor, type ElementInfo } from '@/utils/visualEditor'
 
@@ -941,6 +941,11 @@ onUnmounted(() => {
 
 .message-avatar {
   flex-shrink: 0;
+}
+
+.ai-message .message-avatar .ant-avatar {
+  width: 64px;
+  height: 64px;
 }
 
 .loading-indicator {
