@@ -131,7 +131,7 @@ public class AiCodeGeneratorServiceFactory {
         MessageWindowChatMemory messageWindowChatMemory = MessageWindowChatMemory.builder()
                 .id(appId)
                 .chatMemoryStore(redisChatMemoryStore)
-                .maxMessages(40)
+                .maxMessages(100)
                 .build();
         // 从数据库中加载对话历史到记忆中
         chatHistoryService.loadChatHistoryToMemory(appId, messageWindowChatMemory, 40);
@@ -151,7 +151,7 @@ public class AiCodeGeneratorServiceFactory {
                                         "Error: there is no tool called " + toolExecutionRequest.name())
                         )
                         // 最多连续调用 20 次工具
-                        .maxSequentialToolsInvocations(20)
+                        .maxSequentialToolsInvocations(30)
                         // 添加输入护轨
                         .inputGuardrails(new PromptSafetyInputGuardrail())
                         // 添加输出护轨，为了流式输出，这里不使用
