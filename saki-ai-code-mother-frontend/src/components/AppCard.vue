@@ -1,10 +1,7 @@
 <template>
   <div class="app-card" :class="{ 'app-card--featured': featured }">
     <div class="app-preview">
-      <img v-if="app.cover" :src="app.cover" :alt="app.appName" />
-      <div v-else class="app-placeholder">
-        <span>🤖</span>
-      </div>
+      <img :src="app.cover || defaultCover" :alt="app.appName" />
       <div class="app-overlay">
         <a-space>
           <a-button type="primary" @click="handleViewChat">查看对话</a-button>
@@ -31,6 +28,8 @@
 </template>
 
 <script setup lang="ts">
+import defaultCover from '@/assets/ZeroCode-Logo.png'
+
 interface Props {
   app: API.AppVO
   featured?: boolean
@@ -100,11 +99,6 @@ const handleViewWork = () => {
   height: 100%;
   object-fit: cover;
   border-radius: 12px 12px 0 0;
-}
-
-.app-placeholder {
-  font-size: 48px;
-  color: #d9d9d9;
 }
 
 .app-overlay {

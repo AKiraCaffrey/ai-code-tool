@@ -4,14 +4,14 @@ declare namespace API {
   }
 
   type AppAdminUpdateRequest = {
-    id?: number
+    id?: string
     appName?: string
     cover?: string
     priority?: number
   }
 
   type AppDeployRequest = {
-    appId?: number
+    appId?: string
   }
 
   type AppQueryRequest = {
@@ -19,23 +19,23 @@ declare namespace API {
     pageSize?: number
     sortField?: string
     sortOrder?: string
-    id?: number
+    id?: string
     appName?: string
     cover?: string
     initPrompt?: string
     codeGenType?: string
     deployKey?: string
     priority?: number
-    userId?: number
+    userId?: string
   }
 
   type AppUpdateRequest = {
-    id?: number
+    id?: string
     appName?: string
   }
 
   type AppVO = {
-    id?: number
+    id?: string
     appName?: string
     cover?: string
     initPrompt?: string
@@ -43,7 +43,7 @@ declare namespace API {
     deployKey?: string
     deployedTime?: string
     priority?: number
-    userId?: number
+    userId?: string
     createTime?: string
     updateTime?: string
     user?: UserVO
@@ -139,7 +139,7 @@ declare namespace API {
   }
 
   type DeleteRequest = {
-    id?: number
+    id?: string
   }
 
   type downloadAppCodeParams = {
@@ -265,8 +265,44 @@ declare namespace API {
     userRole?: string
   }
 
+  type UserUpdateMyRequest = {
+    userName?: string
+    userAvatar?: string
+    userProfile?: string
+  }
+
+  type PostVO = {
+    id?: string
+    userId?: string
+    categoryId?: string
+    title?: string
+    content?: string
+    firstImageUrl?: string
+    viewCount?: number
+    likeCount?: number
+    commentCount?: number
+    isTop?: number
+    createTime?: string
+    updateTime?: string
+    user?: UserVO
+    categoryName?: string
+    isLiked?: boolean
+  }
+
+  type BaseResponseListAppVO = {
+    code?: number
+    data?: AppVO[]
+    message?: string
+  }
+
+  type BaseResponseListPostVO = {
+    code?: number
+    data?: PostVO[]
+    message?: string
+  }
+
   type UserVO = {
-    id?: number
+    id?: string
     userAccount?: string
     userName?: string
     userAvatar?: string

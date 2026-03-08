@@ -13,6 +13,8 @@ import com.saki.sakiaicodetoolbackend.exception.ThrowUtils;
 import com.saki.sakiaicodetoolbackend.model.dto.user.*;
 import com.saki.sakiaicodetoolbackend.model.entity.User;
 import com.saki.sakiaicodetoolbackend.model.vo.LoginUserVO;
+import com.saki.sakiaicodetoolbackend.model.vo.AppVO;
+import com.saki.sakiaicodetoolbackend.model.vo.PostVO;
 import com.saki.sakiaicodetoolbackend.model.vo.UserVO;
 import com.saki.sakiaicodetoolbackend.service.UserService;
 import jakarta.annotation.Resource;
@@ -197,5 +199,62 @@ public class UserController {
         List<UserVO> userVOList = userService.getUserVOList(userPage.getRecords());
         userVOPage.setRecords(userVOList);
         return ResultUtils.success(userVOPage);
+    }
+
+    /**
+     * 更新当前用户信息
+     *
+     * @param userUpdateMyRequest 更新请求参数
+     * @param request             HTTP请求对象
+     * @return 更新是否成功
+     */
+    @PostMapping("/update/my")
+    public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest, HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+        boolean result = userService.updateMyUser(userUpdateMyRequest, loginUser.getId());
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 获取当前用户创建的应用列表
+     *
+     * @param request HTTP请求对象
+     * @return 应用列表
+     */
+    @GetMapping("/my/apps")
+    public BaseResponse<List<AppVO>> getMyApps(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+        List<AppVO> appVOList = userService.getMyApps(loginUser.getId());
+        return ResultUtils.success(appVOList);
+    }
+
+    /**
+     * 获取当前用户发布的帖子列表
+     *
+     * @param request HTTP请求对象
+     * @return 帖子列表
+     */
+    @GetMapping("/my/posts")
+    public BaseResponse<List<PostVO>> getMyPosts(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+        List<PostVO> postVOList = userService.getMyPosts(loginUser.getId());
+        return ResultUtils.success(postVOList);
+    }
+
+    /**
+     * 获取当前用户点赞的帖子列表
+     *
+     * @param request HTTP请求对象
+     * @return 帖子列表
+     */
+    @GetMapping("/my/liked/posts")
+    public BaseResponse<List<PostVO>> getMyLikedPosts(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+        List<PostVO> postVOList = userService.getMyLikedPosts(loginUser.getId());
+        return ResultUtils.success(postVOList);
     }
 }

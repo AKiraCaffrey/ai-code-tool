@@ -28,6 +28,11 @@
             </a-space>
             <template #overlay>
               <a-menu>
+                <a-menu-item @click="goToUserCenter">
+                  <IdcardOutlined />
+                  个人中心
+                </a-menu-item>
+                <a-menu-divider />
                 <a-menu-item @click="doLogout">
                   <LogoutOutlined />
                   退出登录
@@ -48,7 +53,7 @@ import { useRouter } from 'vue-router'
 import { type MenuProps, message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/loginUser.ts'
 import { userLogout } from '@/api/userController.ts'
-import { LogoutOutlined, HomeOutlined, UserOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
+import { LogoutOutlined, HomeOutlined, UserOutlined, AppstoreOutlined, MessageOutlined, FileTextOutlined, IdcardOutlined } from '@ant-design/icons-vue'
 
 const loginUserStore = useLoginUserStore()
 const router = useRouter()
@@ -80,6 +85,12 @@ const originItems = [
     title: '主页',
   },
   {
+    key: '/community',
+    icon: () => h(MessageOutlined),
+    label: '交流社区',
+    title: '交流社区',
+  },
+  {
     key: '/admin/userManage',
     icon: () => h(UserOutlined),
     label: '用户管理',
@@ -90,6 +101,12 @@ const originItems = [
     icon: () => h(AppstoreOutlined),
     label: '应用管理',
     title: '应用管理',
+  },
+  {
+    key: '/admin/postManage',
+    icon: () => h(FileTextOutlined),
+    label: '帖子管理',
+    title: '帖子管理',
   },
 ]
 
@@ -127,6 +144,11 @@ const doLogout = async () => {
   } else {
     message.error('退出登录失败，' + res.data.message)
   }
+}
+
+const goToUserCenter = () => {
+  const url = router.resolve('/user/center').href
+  window.open(url, '_blank')
 }
 </script>
 
@@ -174,7 +196,7 @@ const doLogout = async () => {
 }
 
 .logo {
-  height: 200px;
+  height: 150px;
   width: auto;
   margin-right: -60px;
 }

@@ -710,7 +710,7 @@ const deployApp = async () => {
   deploying.value = true
   try {
     const res = await deployAppApi({
-      appId: appId.value as unknown as number,
+      appId: appId.value,
     })
 
     if (res.data.code === 0 && res.data.data) {
