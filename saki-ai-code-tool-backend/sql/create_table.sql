@@ -61,3 +61,127 @@ create table chat_history
     INDEX idx_createTime (create_time),             -- 提升基于时间的查询性能
     INDEX idx_appId_createTime (app_id, create_time) -- 游标查询核心索引
 ) comment '对话历史' collate = utf8mb4_unicode_ci;
+
+-- =============================
+-- 帖子分类表
+-- =============================
+
+DROP TABLE IF EXISTS post_category;
+CREATE TABLE post_category
+(
+    id           bigint auto_increment primary key comment '分类id',
+    name         varchar(128)                        not null comment '分类名称',
+    sort_order   int          default 0              not null comment '排序值',
+    create_time  datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time  datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    is_delete    tinyint      default 0              not null comment '是否删除',
+    index idx_sort_order (sort_order),
+    index idx_is_delete (is_delete)
+)
+    comment '帖子分类'
+        collate = utf8mb4_unicode_ci;
+
+-- =============================
+-- 帖子表
+-- =============================
+
+DROP TABLE IF EXISTS post;
+CREATE TABLE post
+(
+    id             bigint auto_increment primary key comment '帖子id',
+    user_id        bigint                           not null comment '发帖用户id',
+    category_id    bigint                           not null comment '分类id',
+    title          varchar(512)                     not null comment '标题',
+    content        longtext                         not null comment '帖子内容（富文本HTML）',
+    view_count     int          default 0           not null comment '浏览量',
+    like_count     int          default 0           not null comment '点赞数',
+    comment_count  int          default 0           not null comment '评论数',
+    is_top         tinyint      default 0           not null comment '是否置顶',
+    create_time    datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time    datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    is_delete      tinyint      default 0           not null comment '是否删除',
+
+    index idx_user_id (user_id),
+    index idx_category_id (category_id),
+    index idx_create_time (create_time),
+    index idx_is_delete (is_delete),
+    fulltext index ft_title (title)
+)
+    comment '帖子'
+        collate = utf8mb4_unicode_ci;
+
+create index idx_post_time_id
+on post (create_time desc, id desc);
+
+alter table post
+add column first_image_url varchar(1024) null comment '首图地址';
+
+-- =============================
+-- 评论表（支持二级评论）
+-- =============================
+
+DROP TABLE IF EXISTS comment;
+CREATE TABLE comment
+(
+    id                 bigint auto_increment primary key comment '评论id',
+    post_id            bigint                         not null comment '帖子id',
+    user_id            bigint                         not null comment '评论用户id',
+    parent_comment_id  bigint                         null comment '父评论id（为空为一级评论）',
+    reply_user_id      bigint                         null comment '被回复用户id',
+    content            longtext                       not null comment '评论内容（富文本HTML）',
+    like_count         int          default 0         not null comment '点赞数',
+    create_time        datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    update_time        datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    is_delete          tinyint      default 0         not null comment '是否删除',
+
+    index idx_post_id (post_id),
+    index idx_user_id (user_id),
+    index idx_parent_comment_id (parent_comment_id),
+    index idx_reply_user_id (reply_user_id),
+    index idx_create_time (create_time),
+    index idx_is_delete (is_delete)
+)
+    comment '评论（支持二级评论）'
+        collate = utf8mb4_unicode_ci;
+
+
+-- =============================
+-- 帖子点赞表
+-- =============================
+
+DROP TABLE IF EXISTS post_like;
+CREATE TABLE post_like
+(
+    id          bigint auto_increment primary key comment '主键id',
+    post_id     bigint                        not null comment '帖子id',
+    user_id     bigint                        not null comment '用户id',
+    create_time datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    is_delete   tinyint  default 0            not null comment '是否取消点赞',
+
+    unique key uk_post_user (post_id, user_id),
+    index idx_user_id (user_id),
+    index idx_post_id (post_id)
+)
+    comment '帖子点赞'
+        collate = utf8mb4_unicode_ci;
+
+
+-- =============================
+-- 评论点赞表
+-- =============================
+
+DROP TABLE IF EXISTS comment_like;
+CREATE TABLE comment_like
+(
+    id          bigint auto_increment primary key comment '主键id',
+    comment_id  bigint                        not null comment '评论id',
+    user_id     bigint                        not null comment '用户id',
+    create_time datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    is_delete   tinyint  default 0            not null comment '是否取消点赞',
+
+    unique key uk_comment_user (comment_id, user_id),
+    index idx_user_id (user_id),
+    index idx_comment_id (comment_id)
+)
+    comment '评论点赞'
+        collate = utf8mb4_unicode_ci;
