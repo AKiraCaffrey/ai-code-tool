@@ -31,12 +31,25 @@ public class BuildStatusMessage extends StreamMessage {
      */
     private Integer progress;
 
+    /**
+     * 构造函数
+     *
+     * @param status  状态值
+     * @param message 状态描述信息
+     */
     public BuildStatusMessage(String status, String message) {
         super(StreamMessageTypeEnum.BUILD_STATUS.getValue());
         this.status = status;
         this.message = message;
     }
 
+    /**
+     * 构造函数
+     *
+     * @param status   状态值
+     * @param message  状态描述信息
+     * @param progress 进度百分比
+     */
     public BuildStatusMessage(String status, String message, Integer progress) {
         super(StreamMessageTypeEnum.BUILD_STATUS.getValue());
         this.status = status;

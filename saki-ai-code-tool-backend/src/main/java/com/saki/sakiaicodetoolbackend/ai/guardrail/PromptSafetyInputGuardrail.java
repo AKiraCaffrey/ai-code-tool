@@ -25,7 +25,9 @@ public class PromptSafetyInputGuardrail implements InputGuardrail {
             "破解", "hack", "绕过", "bypass", "越狱", "jailbreak"
     );
 
-    // 注入攻击模式
+    /**
+     * 注入攻击模式列表
+     */
     private static final List<Pattern> INJECTION_PATTERNS = Arrays.asList(
             Pattern.compile("(?i)ignore\\s+(?:previous|above|all)\\s+(?:instructions?|commands?|prompts?)"),
             Pattern.compile("(?i)(?:forget|disregard)\\s+(?:everything|all)\\s+(?:above|before)"),
@@ -34,6 +36,12 @@ public class PromptSafetyInputGuardrail implements InputGuardrail {
             Pattern.compile("(?i)new\\s+(?:instructions?|commands?|prompts?)\\s*:")
     );
 
+    /**
+     * 验证用户输入的安全性
+     *
+     * @param userMessage 用户消息
+     * @return 验证结果
+     */
     @Override
     public InputGuardrailResult validate(UserMessage userMessage) {
         String input = userMessage.singleText();

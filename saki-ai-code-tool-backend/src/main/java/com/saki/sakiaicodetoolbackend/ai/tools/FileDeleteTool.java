@@ -15,12 +15,24 @@ import java.nio.file.Paths;
 
 /**
  * 文件删除工具
- * 支持 AI 通过工具调用的方式删除文件
+ * <p>
+ * 支持AI通过工具调用的方式删除文件，包含安全检查机制
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Slf4j
 @Component
 public class FileDeleteTool extends BaseTool {
 
+    /**
+     * 删除指定路径的文件
+     *
+     * @param relativeFilePath 文件的相对路径
+     * @param appId            应用ID
+     * @return 操作结果信息
+     */
     @Tool("删除指定路径的文件")
     public String deleteFile(
             @P("文件的相对路径")
@@ -57,6 +69,9 @@ public class FileDeleteTool extends BaseTool {
 
     /**
      * 判断是否是重要文件，不允许删除
+     *
+     * @param fileName 文件名
+     * @return 是否是重要文件
      */
     private boolean isImportantFile(String fileName) {
         String[] importantFiles = {
@@ -73,16 +88,32 @@ public class FileDeleteTool extends BaseTool {
         return false;
     }
 
+    /**
+     * 获取工具名称
+     *
+     * @return 工具英文名称
+     */
     @Override
     public String getToolName() {
         return "deleteFile";
     }
 
+    /**
+     * 获取工具显示名称
+     *
+     * @return 工具中文名称
+     */
     @Override
     public String getDisplayName() {
         return "删除文件";
     }
 
+    /**
+     * 生成工具执行结果格式
+     *
+     * @param arguments 工具执行参数
+     * @return 格式化的工具执行结果
+     */
     @Override
     public String generateToolExecutedResult(JSONObject arguments) {
         String relativeFilePath = arguments.getStr("relativeFilePath");

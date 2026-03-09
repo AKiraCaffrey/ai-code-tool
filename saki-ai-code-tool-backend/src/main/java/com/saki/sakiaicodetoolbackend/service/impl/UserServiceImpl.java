@@ -7,13 +7,24 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.saki.sakiaicodetoolbackend.exception.BusinessException;
 import com.saki.sakiaicodetoolbackend.exception.ErrorCode;
+import com.saki.sakiaicodetoolbackend.exception.ThrowUtils;
 import com.saki.sakiaicodetoolbackend.mapper.UserMapper;
 import com.saki.sakiaicodetoolbackend.model.dto.user.UserQueryRequest;
+import com.saki.sakiaicodetoolbackend.model.dto.user.UserUpdateMyRequest;
 import com.saki.sakiaicodetoolbackend.model.entity.User;
 import com.saki.sakiaicodetoolbackend.model.enums.UserRoleEnum;
+import com.saki.sakiaicodetoolbackend.model.vo.AppVO;
 import com.saki.sakiaicodetoolbackend.model.vo.LoginUserVO;
+import com.saki.sakiaicodetoolbackend.model.vo.PostVO;
 import com.saki.sakiaicodetoolbackend.model.vo.UserVO;
 import com.saki.sakiaicodetoolbackend.service.UserService;
+import com.saki.sakiaicodetoolbackend.mapper.AppMapper;
+import com.saki.sakiaicodetoolbackend.mapper.PostMapper;
+import com.saki.sakiaicodetoolbackend.mapper.PostLikeMapper;
+import com.saki.sakiaicodetoolbackend.model.entity.App;
+import com.saki.sakiaicodetoolbackend.model.entity.Post;
+import com.saki.sakiaicodetoolbackend.model.entity.PostLike;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -66,6 +77,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUserAccount(userAccount);
         user.setUserPassword(encryptPassword);
         user.setUserName("无名");
+        user.setUserProfile("ZeroCode 冒险家，快来丰富你的个人介绍~");
         user.setUserRole(UserRoleEnum.USER.getValue());
         boolean saveResult = this.save(user);
         if (!saveResult) {
@@ -187,5 +199,119 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 盐值，混淆密码
         final String SALT = "sakisaki";
         return DigestUtils.md5DigestAsHex((userPassword + SALT).getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Resource
+    private AppMapper appMapper;
+
+    @Resource
+    private PostMapper postMapper;
+
+    @Resource
+    private PostLikeMapper postLikeMapper;
+
+    @Override
+    public boolean updateMyUser(UserUpdateMyRequest request, Long loginUserId) {
+        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR, "请求参数为空");
+        ThrowUtils.throwIf(loginUserId == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+
+        User user = this.getById(loginUserId);
+        ThrowUtils.throwIf(user == null, ErrorCode.NOT_FOUND_ERROR, "用户不存在");
+
+        if (StrUtil.isNotBlank(request.getUserName())) {
+            user.setUserName(request.getUserName());
+        }
+        if (StrUtil.isNotBlank(request.getUserProfile())) {
+            user.setUserProfile(request.getUserProfile());
+        }
+        if (StrUtil.isNotBlank(request.getUserAvatar())) {
+            user.setUserAvatar(request.getUserAvatar());
+        }
+        return this.updateById(user);
+    }
+
+    @Override
+    public List<AppVO> getMyApps(Long loginUserId) {
+        ThrowUtils.throwIf(loginUserId == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .eq("user_id", loginUserId)
+                .eq("is_delete", 0)
+                .orderBy("create_time", false);
+        List<App> appList = appMapper.selectListByQuery(queryWrapper);
+        return getAppVOList(appList);
+    }
+
+    @Override
+    public List<PostVO> getMyPosts(Long loginUserId) {
+        ThrowUtils.throwIf(loginUserId == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .eq("user_id", loginUserId)
+                .eq("is_delete", 0)
+                .orderBy("create_time", false);
+        List<Post> postList = postMapper.selectListByQuery(queryWrapper);
+        return getPostVOList(postList, loginUserId);
+    }
+
+    @Override
+    public List<PostVO> getMyLikedPosts(Long loginUserId) {
+        ThrowUtils.throwIf(loginUserId == null, ErrorCode.NOT_LOGIN_ERROR, "用户未登录");
+        QueryWrapper likeQueryWrapper = QueryWrapper.create()
+                .eq("user_id", loginUserId)
+                .eq("is_delete", 0);
+        List<PostLike> postLikeList = postLikeMapper.selectListByQuery(likeQueryWrapper);
+        if (CollUtil.isEmpty(postLikeList)) {
+            return new ArrayList<>();
+        }
+        List<Long> postIds = postLikeList.stream()
+                .map(PostLike::getPostId)
+                .collect(Collectors.toList());
+        QueryWrapper postQueryWrapper = QueryWrapper.create()
+                .in("id", postIds)
+                .eq("is_delete", 0)
+                .orderBy("create_time", false);
+        List<Post> postList = postMapper.selectListByQuery(postQueryWrapper);
+        return getPostVOList(postList, loginUserId);
+    }
+
+    private List<AppVO> getAppVOList(List<App> appList) {
+        if (CollUtil.isEmpty(appList)) {
+            return new ArrayList<>();
+        }
+        return appList.stream().map(app -> {
+            AppVO appVO = new AppVO();
+            BeanUtil.copyProperties(app, appVO);
+            Long userId = app.getUserId();
+            if (userId != null) {
+                User user = this.getById(userId);
+                UserVO userVO = getUserVO(user);
+                appVO.setUser(userVO);
+            }
+            return appVO;
+        }).collect(Collectors.toList());
+    }
+
+    private List<PostVO> getPostVOList(List<Post> postList, Long loginUserId) {
+        if (CollUtil.isEmpty(postList)) {
+            return new ArrayList<>();
+        }
+        return postList.stream().map(post -> {
+            PostVO postVO = new PostVO();
+            BeanUtil.copyProperties(post, postVO);
+            Long userId = post.getUserId();
+            if (userId != null) {
+                User user = this.getById(userId);
+                UserVO userVO = getUserVO(user);
+                postVO.setUser(userVO);
+            }
+            if (loginUserId != null) {
+                QueryWrapper likeQueryWrapper = QueryWrapper.create()
+                    .eq("post_id", post.getId())
+                    .eq("user_id", loginUserId);
+                PostLike postLike = postLikeMapper.selectOneByQuery(likeQueryWrapper);
+                postVO.setIsLiked(postLike != null);
+            }
+            return postVO;
+        }).collect(Collectors.toList());
     }
 }

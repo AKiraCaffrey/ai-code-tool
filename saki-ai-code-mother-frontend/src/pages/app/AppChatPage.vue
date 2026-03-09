@@ -215,7 +215,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onUnmounted, computed } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useLoginUserStore } from '@/stores/loginUser'
@@ -231,7 +231,7 @@ import request from '@/request'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import AppDetailModal from '@/components/AppDetailModal.vue'
 import DeploySuccessModal from '@/components/DeploySuccessModal.vue'
-import aiAvatar from '@/assets/aiAvatar.png'
+import aiAvatar from '@/assets/ZeroCode-Logo.png'
 import { API_BASE_URL, getStaticPreviewUrl } from '@/config/env'
 import { VisualEditor, type ElementInfo } from '@/utils/visualEditor'
 
@@ -266,6 +266,8 @@ const messages = ref<Message[]>([])
 const userInput = ref('')
 const isGenerating = ref(false)
 const messagesContainer = ref<HTMLElement>()
+const autoScroll = ref(true)
+let lastScrollTop = 0
 
 // 对话历史相关
 const loadingHistory = ref(false)
@@ -415,6 +417,8 @@ const fetchAppInfo = async () => {
 
 // 发送初始消息
 const sendInitialMessage = async (prompt: string) => {
+  autoScroll.value = true
+  
   // 添加用户消息
   messages.value.push({
     type: 'user',
@@ -442,6 +446,8 @@ const sendMessage = async () => {
   if (!userInput.value.trim() || isGenerating.value) {
     return
   }
+
+  autoScroll.value = true
 
   let message = userInput.value.trim()
   // 如果有选中的元素，将元素信息添加到提示词中
@@ -540,6 +546,7 @@ const generateCode = async (userMessage: string, aiMessageIndex: number) => {
           // 普通文本显示在聊天框
           fullContent += content
           messages.value[aiMessageIndex].content = fullContent
+          scrollToBottom()
         }
       } catch (error) {
         console.error('解析消息失败:', error)
@@ -631,8 +638,27 @@ const updatePreview = () => {
 
 // 滚动到底部
 const scrollToBottom = () => {
-  if (messagesContainer.value) {
+  if (messagesContainer.value && autoScroll.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}
+
+// 处理滚动事件
+const handleScroll = () => {
+  if (!messagesContainer.value) return
+  
+  const { scrollTop, scrollHeight, clientHeight } = messagesContainer.value
+  const distanceToBottom = scrollHeight - scrollTop - clientHeight
+  
+  // 检测是否向上滚动（用户主动滚动）
+  const isScrollingUp = scrollTop < lastScrollTop
+  lastScrollTop = scrollTop
+  
+  if (distanceToBottom <= 50) {
+    autoScroll.value = true
+  } else if (isScrollingUp) {
+    // 用户向上滚动时取消自动跟随
+    autoScroll.value = false
   }
 }
 
@@ -684,7 +710,7 @@ const deployApp = async () => {
   deploying.value = true
   try {
     const res = await deployAppApi({
-      appId: appId.value as unknown as number,
+      appId: appId.value,
     })
 
     if (res.data.code === 0 && res.data.data) {
@@ -791,9 +817,22 @@ onMounted(() => {
   })
 })
 
+// 监听 messagesContainer 变化，添加滚动事件
+watch(messagesContainer, (newVal, oldVal) => {
+  if (oldVal) {
+    oldVal.removeEventListener('scroll', handleScroll)
+  }
+  if (newVal) {
+    newVal.addEventListener('scroll', handleScroll)
+  }
+})
+
 // 清理资源
 onUnmounted(() => {
-  // EventSource 会在组件卸载时自动清理
+  // 移除滚动事件监听
+  if (messagesContainer.value) {
+    messagesContainer.value.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
 
@@ -902,6 +941,11 @@ onUnmounted(() => {
 
 .message-avatar {
   flex-shrink: 0;
+}
+
+.ai-message .message-avatar .ant-avatar {
+  width: 64px;
+  height: 64px;
 }
 
 .loading-indicator {

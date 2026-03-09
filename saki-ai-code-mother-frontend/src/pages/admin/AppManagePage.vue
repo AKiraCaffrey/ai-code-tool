@@ -53,7 +53,7 @@
         </template>
         <template v-else-if="column.dataIndex === 'priority'">
           <a-tag v-if="record.priority === 99" color="gold">精选</a-tag>
-          <span v-else>{{ record.priority || 0 }}</span>
+          <a-tag v-else color="default">未精选</a-tag>
         </template>
         <template v-else-if="column.dataIndex === 'deployedTime'">
           <span v-if="record.deployedTime">
@@ -243,7 +243,7 @@ const toggleFeatured = async (app: API.AppVO) => {
 }
 
 // 删除应用
-const deleteApp = async (id: number | undefined) => {
+const deleteApp = async (id: string | undefined) => {
   if (!id) return
 
   try {

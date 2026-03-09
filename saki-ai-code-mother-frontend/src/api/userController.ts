@@ -125,3 +125,39 @@ export async function updateUser(body: API.UserUpdateRequest, options?: { [key: 
     ...(options || {}),
   })
 }
+
+/** 更新当前用户信息 POST /user/update/my */
+export async function updateMyUser(body: API.UserUpdateMyRequest, options?: { [key: string]: any }) {
+  return request<API.BaseResponseBoolean>('/user/update/my', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
+/** 获取当前用户创建的应用列表 GET /user/my/apps */
+export async function getMyApps(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListAppVO>('/user/my/apps', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
+/** 获取当前用户发布的帖子列表 GET /user/my/posts */
+export async function getMyPosts(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListPostVO>('/user/my/posts', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}
+
+/** 获取当前用户点赞的帖子列表 GET /user/my/liked/posts */
+export async function getMyLikedPosts(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListPostVO>('/user/my/liked/posts', {
+    method: 'GET',
+    ...(options || {}),
+  })
+}

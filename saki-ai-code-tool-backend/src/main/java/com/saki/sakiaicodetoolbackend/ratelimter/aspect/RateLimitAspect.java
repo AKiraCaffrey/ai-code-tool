@@ -25,24 +25,43 @@ import java.time.Duration;
 
 /**
  * 限流切面核心逻辑
+ * <p>
+ * 基于 Redisson 实现分布式限流，支持接口级别、用户级别、IP级别限流
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Aspect
 @Component
 @Slf4j
 public class RateLimitAspect {
 
+    /**
+     * Redisson 客户端
+     */
     @Resource
     private RedissonClient redissonClient;
 
+    /**
+     * 用户服务
+     */
     @Resource
     private UserService userService;
 
+    /**
+     * 前置通知，执行限流检查
+     *
+     * @param point      切点
+     * @param rateLimit  限流注解
+     */
     @Before("@annotation(rateLimit)")
     public void doBefore(JoinPoint point, RateLimit rateLimit) {
         String key = generateRateLimitKey(point, rateLimit);
         // 使用 Redisson 的分布式限流器
         RRateLimiter rateLimiter = redissonClient.getRateLimiter(key);
-        rateLimiter.expire(Duration.ofHours(1)); // 1 小时后过期
+        // 1 小时后过期
+        rateLimiter.expire(Duration.ofHours(1));
         // 设置限流器参数：每个时间窗口允许的请求数和时间窗口
         rateLimiter.trySetRate(RateType.OVERALL, rateLimit.rate(), rateLimit.rateInterval(), RateIntervalUnit.SECONDS);
         // 尝试获取一个令牌，如果获取失败则限流
@@ -54,9 +73,9 @@ public class RateLimitAspect {
     /**
      * 生成限流key
      *
-     * @param point
-     * @param rateLimit
-     * @return
+     * @param point      切点
+     * @param rateLimit  限流注解
+     * @return 限流key
      */
     private String generateRateLimitKey(JoinPoint point, RateLimit rateLimit) {
         StringBuilder keyBuilder = new StringBuilder();
@@ -71,8 +90,10 @@ public class RateLimitAspect {
                 // 接口级别：方法名
                 MethodSignature signature = (MethodSignature) point.getSignature();
                 Method method = signature.getMethod();
-                keyBuilder.append("api:").append(method.getDeclaringClass().getSimpleName())
-                        .append(".").append(method.getName());
+                keyBuilder.append("api:")
+                        .append(method.getDeclaringClass().getSimpleName())
+                        .append(".")
+                        .append(method.getName());
                 break;
             case USER:
                 // 用户级别：用户ID
@@ -104,7 +125,7 @@ public class RateLimitAspect {
     /**
      * 获取客户端IP
      *
-     * @return
+     * @return 客户端IP地址
      */
     private String getClientIP() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

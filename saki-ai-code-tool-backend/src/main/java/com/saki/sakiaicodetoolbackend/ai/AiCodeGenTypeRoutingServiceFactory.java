@@ -23,18 +23,20 @@ public class AiCodeGenTypeRoutingServiceFactory {
     /**
      * 创建AI代码生成类型路由服务实例
      *
-     * @return AI代码生成类型路由服务
+     * @return AI代码生成类型路由服务实例
      */
     public AiCodeGenTypeRoutingService createAiCodeGenTypeRoutingService() {
         ChatModel chatModel = SpringContextUtil.getBean("routingChatModelPrototype", ChatModel.class);
-        // 返回一个 实现了AiCodeGenTypeRoutingService接口的动态代理对象
+        // 返回一个实现了AiCodeGenTypeRoutingService接口的动态代理对象
         return AiServices.builder(AiCodeGenTypeRoutingService.class)
                 .chatModel(chatModel)
                 .build();
     }
 
     /**
-     * 默认提供一个 Bean
+     * 默认提供一个AI代码生成类型路由服务Bean
+     *
+     * @return AI代码生成类型路由服务实例
      */
     @Bean
     public AiCodeGenTypeRoutingService aiCodeGenTypeRoutingService() {

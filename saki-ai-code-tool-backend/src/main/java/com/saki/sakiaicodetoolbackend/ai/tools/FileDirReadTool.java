@@ -18,7 +18,12 @@ import java.util.Set;
 
 /**
  * 文件目录读取工具
- * 使用 Hutool 简化文件操作
+ * <p>
+ * 使用Hutool简化文件操作，支持AI读取目录结构
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
  */
 @Slf4j
 @Component
@@ -39,6 +44,13 @@ public class FileDirReadTool extends BaseTool {
             ".log", ".tmp", ".cache", ".lock"
     );
 
+    /**
+     * 读取目录结构，获取指定目录下的所有文件和子目录信息
+     *
+     * @param relativeDirPath 目录的相对路径，为空则读取整个项目结构
+     * @param appId           应用ID
+     * @return 目录结构信息或错误信息
+     */
     @Tool("读取目录结构，获取指定目录下的所有文件和子目录信息")
     public String readDir(
             @P("目录的相对路径，为空则读取整个项目结构")
@@ -85,6 +97,10 @@ public class FileDirReadTool extends BaseTool {
 
     /**
      * 计算文件相对于根目录的深度
+     *
+     * @param root 根目录
+     * @param file 目标文件
+     * @return 相对深度
      */
     private int getRelativeDepth(File root, File file) {
         Path rootPath = root.toPath();
@@ -94,6 +110,9 @@ public class FileDirReadTool extends BaseTool {
 
     /**
      * 判断是否应该忽略该文件或目录
+     *
+     * @param fileName 文件名
+     * @return 是否忽略
      */
     private boolean shouldIgnore(String fileName) {
         // 检查是否在忽略名称列表中
@@ -105,16 +124,32 @@ public class FileDirReadTool extends BaseTool {
         return IGNORED_EXTENSIONS.stream().anyMatch(fileName::endsWith);
     }
 
+    /**
+     * 获取工具名称
+     *
+     * @return 工具英文名称
+     */
     @Override
     public String getToolName() {
         return "readDir";
     }
 
+    /**
+     * 获取工具显示名称
+     *
+     * @return 工具中文名称
+     */
     @Override
     public String getDisplayName() {
         return "读取目录";
     }
 
+    /**
+     * 生成工具执行结果格式
+     *
+     * @param arguments 工具执行参数
+     * @return 格式化的工具执行结果
+     */
     @Override
     public String generateToolExecutedResult(JSONObject arguments) {
         String relativeDirPath = arguments.getStr("relativeDirPath");

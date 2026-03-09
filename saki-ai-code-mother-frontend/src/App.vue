@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import BasicLayout from '@/layouts/BasicLayout.vue'
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+const route = useRoute()
+
+const isStandalonePage = computed(() => {
+  return route.path === '/post/create' || route.path.startsWith('/post/edit/')
+})
 </script>
 
 <template>
-  <BasicLayout />
+  <BasicLayout v-if="!isStandalonePage" />
+  <router-view v-else />
 </template>
 
 <style>

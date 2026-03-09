@@ -7,6 +7,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 限流注解
+ * <p>
+ * 用于标记需要进行限流控制的接口方法，支持多种限流策略
+ *
+ * @author Neal Caffrey
+ * @version 1.0
+ * @since 2026-03-01
+ */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {

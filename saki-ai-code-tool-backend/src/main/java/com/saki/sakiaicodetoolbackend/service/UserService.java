@@ -3,6 +3,7 @@ package com.saki.sakiaicodetoolbackend.service;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
 import com.saki.sakiaicodetoolbackend.model.dto.user.UserQueryRequest;
+import com.saki.sakiaicodetoolbackend.model.dto.user.UserUpdateMyRequest;
 import com.saki.sakiaicodetoolbackend.model.entity.User;
 import com.saki.sakiaicodetoolbackend.model.vo.LoginUserVO;
 import com.saki.sakiaicodetoolbackend.model.vo.UserVO;
@@ -96,4 +97,37 @@ public interface UserService extends IService<User> {
      * @return 加密后的用户密码
      */
     String getEncryptPassword(String userPassword);
+
+    /**
+     * 更新当前用户信息
+     *
+     * @param request     更新请求参数
+     * @param loginUserId 当前登录用户ID
+     * @return 是否更新成功
+     */
+    boolean updateMyUser(UserUpdateMyRequest request, Long loginUserId);
+
+    /**
+     * 获取当前用户创建的应用列表
+     *
+     * @param loginUserId 当前登录用户ID
+     * @return 应用列表
+     */
+    List<com.saki.sakiaicodetoolbackend.model.vo.AppVO> getMyApps(Long loginUserId);
+
+    /**
+     * 获取当前用户发布的帖子列表
+     *
+     * @param loginUserId 当前登录用户ID
+     * @return 帖子列表
+     */
+    List<com.saki.sakiaicodetoolbackend.model.vo.PostVO> getMyPosts(Long loginUserId);
+
+    /**
+     * 获取当前用户点赞的帖子列表
+     *
+     * @param loginUserId 当前登录用户ID
+     * @return 帖子列表
+     */
+    List<com.saki.sakiaicodetoolbackend.model.vo.PostVO> getMyLikedPosts(Long loginUserId);
 }

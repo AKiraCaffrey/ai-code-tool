@@ -1,10 +1,7 @@
 <template>
   <div class="app-card" :class="{ 'app-card--featured': featured }">
     <div class="app-preview">
-      <img v-if="app.cover" :src="app.cover" :alt="app.appName" />
-      <div v-else class="app-placeholder">
-        <span>🤖</span>
-      </div>
+      <img :src="app.cover || defaultCover" :alt="app.appName" />
       <div class="app-overlay">
         <a-space>
           <a-button type="primary" @click="handleViewChat">查看对话</a-button>
@@ -20,8 +17,10 @@
       </div>
       <div class="app-info-right">
         <h3 class="app-title">{{ app.appName || '未命名应用' }}</h3>
-        <p class="app-author">
-          {{ app.user?.userName || (featured ? '官方' : '未知用户') }}
+        <p class="app-meta">
+          <span class="app-author-name">{{ app.user?.userName || (featured ? '官方' : '未知用户') }}</span>
+          <span class="app-divider">·</span>
+          <span class="app-time">{{ formatTime(app.createTime) }}</span>
         </p>
       </div>
     </div>
@@ -29,6 +28,8 @@
 </template>
 
 <script setup lang="ts">
+import defaultCover from '@/assets/ZeroCode-Logo.png'
+
 interface Props {
   app: API.AppVO
   featured?: boolean
@@ -44,6 +45,15 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+const formatTime = (time: string | undefined) => {
+  if (!time) return ''
+  const date = new Date(time)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${year}-${month}-${day}`
+}
 
 const handleViewChat = () => {
   emit('view-chat', props.app.id)
@@ -74,24 +84,21 @@ const handleViewWork = () => {
 }
 
 .app-preview {
-  height: 180px;
+  height: 140px;
   background: #f5f5f5;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
+  border-radius: 12px 12px 0 0;
 }
 
 .app-preview img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.app-placeholder {
-  font-size: 48px;
-  color: #d9d9d9;
+  border-radius: 12px 12px 0 0;
 }
 
 .app-overlay {
@@ -138,12 +145,28 @@ const handleViewWork = () => {
   text-overflow: ellipsis;
 }
 
-.app-author {
+.app-meta {
   font-size: 14px;
   color: #666;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-author-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+.app-divider {
+  color: #999;
+}
+
+.app-time {
+  color: #999;
+  white-space: nowrap;
 }
 </style>
